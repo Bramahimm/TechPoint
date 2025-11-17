@@ -15,7 +15,7 @@ export default function ProductShowcase() {
     <section className="py-12 bg-gray-50">
       <div className="md:px-40 px-4">
         <h2 className="text-2xl font-bold mb-6">Produk Unggulan</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {products.map((product) => (
             <div
               key={product.id}
@@ -26,7 +26,7 @@ export default function ProductShowcase() {
               <img
                 src={product.imageUrl}
                 alt={product.name}
-                className="h-56 w-full object-cover"
+                className="h-40 w-full object-cover"
               />
               <div className="p-4">
                 <h3 className="font-semibold text-gray-800">{product.name}</h3>

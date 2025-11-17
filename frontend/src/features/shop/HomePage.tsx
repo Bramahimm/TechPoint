@@ -1,6 +1,7 @@
 import HeroSection from "@/components/shop/HeroSection";
-import ProductShowcase from "./ProductShowcase";
+import ProductShowcase from "@/features/shop/ProductShowcase";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <Navbar />
       <HeroSection />
       <ProductShowcase />
+      <Footer/>
     </>
   );
 }
