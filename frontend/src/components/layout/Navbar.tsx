@@ -47,7 +47,6 @@ export default function Navbar() {
   const handleRemove = (term: string) => {
     setHistory((prev) => prev.filter((item) => item !== term));
   };
-  
 
   return (
     <nav className="bg-sky-300 shadow-md sticky top-0 z-50">
@@ -126,7 +125,9 @@ export default function Navbar() {
               <span className="hidden md:inline text-sm font-medium">
                 {user.name}
               </span>
-              <span className="text-l font-bold font-semibold text-red-500 ml-2">Logout</span>
+              <span className="text-l font-semibold text-red-500 ml-2">
+                Logout
+              </span>
             </div>
           ) : (
             <a
