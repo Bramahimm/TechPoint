@@ -1,16 +1,13 @@
-import { Routes, Route } from "react-router-dom";
-import LoginPage from "@/features/auth/LoginPage";
-import RegisterPage from "@/features/auth/RegisterPage";
-import HomePage from "./features/shop/HomePage";
+import React from "react";
+import AppRouter from "./router";
+import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
-  console.log("dirender");
-  
   return (
-    <Routes>
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<HomePage/>}/>
-    </Routes>
+    <AuthProvider>
+      <div className="font-sans bg-gray-50 min-h-screen">
+        <AppRouter />
+      </div>
+    </AuthProvider>
   );
 }
