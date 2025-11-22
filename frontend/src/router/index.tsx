@@ -1,34 +1,64 @@
 import { Routes, Route } from "react-router-dom";
+// Import semua komponen yang sudah ada
 import HomePage from "@/features/shop/HomePage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
 import ProtectedRoute from "./ProtectedRoute";
+import ProfilePage from "@/features/user/ProfilePage";
+
+import CartPage from "@/features/shop/CartPage";
+// Import Halaman Checkout yang baru dibuat
+import CheckoutPage from "@/features/shop/CheckoutPage";
+import OrderPage from "@/features/user/OrderPage";
 
 export default function AppRouter() {
   return (
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-        {/* Protected routes (contoh untuk user yang sudah login) */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <div>Profile Page (akan diganti dengan ProfilePage.tsx)</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <div>Orders Page (akan diganti dengan OrdersPage.tsx)</div>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      {/* Cart dan Checkout biasanya memerlukan login, jadi diletakkan di ProtectedRoute */}
+
+      {/* Protected Routes: Pengguna Harus Login */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <OrderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <CartPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ROUTE BARU: Halaman Checkout */}
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Opsional: Tambahkan Route fallback 404 jika ada */}
+      {/* <Route path="*" element={<NotFoundPage />} /> */}
+    </Routes>
   );
 }
