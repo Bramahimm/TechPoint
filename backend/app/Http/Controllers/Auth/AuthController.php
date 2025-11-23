@@ -7,53 +7,66 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // Menampilkan form registrasi
-    public function showRegistrationForm()
-    {
-        // return view('auth.register');
-    }
-
-    // Memproses data registrasi
+    // REGISTER
     public function register(Request $request)
     {
-        // Validasi $request->validate([...])
-        // Buat user baru
-        // User::create([...])
-        // Kirim email verifikasi
-        // Login user
-        // Redirect
+        // 1. Validasi Input dari React
+        $validator = Validator::make($request->all(), [
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // 2. Buat User Baru
+        $user = User::create([
+            'name'     => $request->nama, // Mapping 'nama' dari React ke 'name' di DB
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // 3. Buat Token (Opsional, jika ingin langsung login setelah register)
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Registrasi berhasil',
+            'user'    => $user,
+            'token'   => $token,
+        ], 201);
     }
 
-    // Menampilkan form login
-    public function showLoginForm()
-    {
-        // return view('auth.login');
-    }
-
-    // Memproses data login
+    // LOGIN
     public function login(Request $request)
     {
-        // Validasi $request->validate([...])
-        // Coba autentikasi Auth::attempt([...])
-        // Jika sukses, redirect ke halaman intended
-        // Jika gagal, kembali ke login dengan error
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Email atau password salah'
+            ], 401);
+        }
+
+        $user = User::where('email', $request->email)->firstOrFail();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login berhasil',
+            'user'    => $user,
+            'token'   => $token, // Token ini nanti disimpan di React (localStorage/Cookie)
+        ], 200);
     }
 
-    // Memproses logout
+    // LOGOUT
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        // Redirect ke home
-    }
+        // Hapus token yang sedang digunakan
+        $request->user()->currentAccessToken()->delete();
 
-    // (Opsional) Menangani verifikasi email
-    public function verifyEmail(Request $request)
-    {
-        // Logika untuk verifikasi email
+        return response()->json(['message' => 'Logout berhasil']);
     }
 }

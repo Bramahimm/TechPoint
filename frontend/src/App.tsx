@@ -1,8 +1,13 @@
-import HomePage from "@/features/shop/HomePage"
+import React from "react";
+import AppRouter from "./router";
+import { AuthProvider } from "./context/AuthContext";
+
 export default function App() {
-  console.log("dirender");
-  
   return (
-    <HomePage/>
-  )
+    <AuthProvider>
+      <div className="font-sans bg-gray-50 min-h-screen">
+        <AppRouter />
+      </div>
+    </AuthProvider>
+  );
 }

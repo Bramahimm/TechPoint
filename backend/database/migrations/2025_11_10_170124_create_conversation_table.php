@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             // Relasi antara user (pembeli) dan toko (penjual)
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('toko_id')->constrained('tokos')->onDelete('cascade');
+            $table->foreignId('toko_id')->constrained('toko')->onDelete('cascade');
             $table->timestamps(); // Sesuai ERD: created_at
         });
     }

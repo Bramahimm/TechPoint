@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('ulasan', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
+            $table->foreignId('barang_id')->constrained('barang')->onDelete('cascade');
             $table->tinyInteger('rating'); // 1-5
             $table->text('komentar')->nullable();
             $table->timestamps(); // Sesuai ERD: created_at

@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('barang', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('toko_id')->constrained('tokos')->onDelete('cascade');
-            $table->foreignId('kategori_id')->constrained('kategoris')->onDelete('set null')->nullable();
+            $table->foreignId('toko_id')->constrained('toko')->onDelete('cascade');
+            $table->foreignId('kategori_id')->constrained('kategori')->onDelete('set null')->nullable();
             $table->string('nama');
             $table->text('deskripsi');
             $table->decimal('harga', 10, 2);

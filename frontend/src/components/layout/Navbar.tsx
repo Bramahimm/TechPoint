@@ -6,18 +6,14 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import Logo from "@/assets/images/Logo_TechPoint.webp";
-
-interface User {
-  name: string;
-  isLoggedIn: boolean;
-}
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
+  const { user, isAuthenticated, logout } = useAuth(); // ambil dari AuthContext
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [cartCount] = useState(2);
-  const [user] = useState<User>({ name: "Bram", isLoggedIn: true });
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Ambil riwayat dari localStorage saat pertama kali render
@@ -26,7 +22,7 @@ export default function Navbar() {
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
-  // kita siimpan riwayat ke localStorage setiap kali berubah
+  // Simpan riwayat ke localStorage setiap kali berubah
   useEffect(() => {
     localStorage.setItem("searchHistory", JSON.stringify(history));
   }, [history]);
@@ -35,9 +31,8 @@ export default function Navbar() {
     e.preventDefault();
     if (!search.trim()) return;
 
-    // tambahkan ke history jika belum ada
     if (!history.includes(search.trim())) {
-      setHistory((prev) => [search.trim(), ...prev].slice(0, 5)); // hanya simpan 5 terbaru
+      setHistory((prev) => [search.trim(), ...prev].slice(0, 5));
     }
 
     console.log("Searching for:", search);
@@ -54,8 +49,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="flex items-center justify-between px-6 md:px-40 py-3">
+    <nav className="bg-sky-300 shadow-md sticky top-0 z-50">
+      <div className="flex items-center justify-between px-6 md:px-48 py-3">
         {/* Logo */}
         <a href="/" className="flex items-center">
           <img src={Logo} alt="TechPoint" className="h-20 w-auto" />
@@ -122,17 +117,24 @@ export default function Navbar() {
           </div>
 
           {/* User */}
-          {user.isLoggedIn ? (
-            <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition">
+          {isAuthenticated && user ? (
+            <div
+              className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition"
+              onClick={logout}>
               <FaUserCircle size={22} />
               <span className="hidden md:inline text-sm font-medium">
                 {user.name}
               </span>
+              <span className="text-l font-semibold text-red-500 ml-2">
+                Logout
+              </span>
             </div>
           ) : (
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">
+            <a
+              href="/login"
+              className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">
               Login
-            </button>
+            </a>
           )}
         </div>
       </div>
