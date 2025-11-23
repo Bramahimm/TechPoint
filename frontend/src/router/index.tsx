@@ -10,6 +10,7 @@ import CartPage from "@/features/shop/CartPage";
 // Import Halaman Checkout yang baru dibuat
 import CheckoutPage from "@/features/shop/CheckoutPage";
 import OrderPage from "@/features/user/OrderPage";
+import SellerRouter from "@/features/seller/SellerRouter";
 
 export default function AppRouter() {
   return (
@@ -53,6 +54,14 @@ export default function AppRouter() {
         element={
           <ProtectedRoute>
             <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/*"
+        element={
+          <ProtectedRoute>
+            <SellerRouter />
           </ProtectedRoute>
         }
       />

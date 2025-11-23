@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getFeaturedProducts } from "@/services/productServices";
-import type { Product } from "@/services/productServices";
+import { getFeaturedProducts } from "@/services/dummyProductServices";
+import type { Product } from "@/services/dummyProductServices";
 import { FaStar } from "react-icons/fa";
 import { formatCurrency } from "@/utils/formatCurrency";
 

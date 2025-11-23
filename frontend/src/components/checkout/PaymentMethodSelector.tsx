@@ -1,10 +1,10 @@
-// src/components/checkout/PaymentMethodSelector.tsx (REVISI BESAR)
+
 import React from "react";
 import type {
   PaymentMethod,
   BankOption,
   EWalletOption,
-} from "@/hooks/checkout/usePaymentSelection";
+} from "@/utils/constants";
 import { PAYMENT_METHODS } from "@/utils/constants";
 import PaymentBankOptions from "./PaymentBankOptions";
 import PaymentEWalletOptions from "./PaymentEWalletOptions";
@@ -12,13 +12,16 @@ import PaymentCODOption from "./PaymentCODOption";
 import { Banknote, Landmark, Wallet } from "lucide-react";
 
 interface PaymentSelectorProps {
-  selectedPaymentMethod: PaymentMethod;
+  selectedPaymentMethod: PaymentMethod | null;
   setSelectedPaymentMethod: (method: PaymentMethod) => void;
-  selectedBank: BankOption;
-  setSelectedBank: (bank: BankOption) => void;
-  selectedEWallet: EWalletOption;
-  setSelectedEWallet: (wallet: EWalletOption) => void;
+
+  selectedBank: BankOption | null;
+  setSelectedBank: (bank: BankOption | null) => void;
+
+  selectedEWallet: EWalletOption | null;
+  setSelectedEWallet: (wallet: EWalletOption | null) => void;
 }
+
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Banknote: <Banknote className="w-5 h-5" />,
