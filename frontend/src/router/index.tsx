@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+// Import semua komponen yang sudah ada
 import HomePage from "@/features/shop/HomePage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";

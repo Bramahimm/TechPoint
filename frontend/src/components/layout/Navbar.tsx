@@ -7,22 +7,35 @@ import {
 } from "react-icons/fa";
 import Logo from "@/assets/images/Logo_TechPoint.webp";
 import { useAuth } from "@/context/AuthContext";
+<<<<<<< HEAD
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth(); // ambil dari AuthContext
+=======
+import { Link } from "react-router-dom";
+
+export default function Navbar() {
+  const { user, isAuthenticated, logout } = useAuth();
+>>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [cartCount] = useState(2);
+<<<<<<< HEAD
+=======
+  const [showUserMenu, setShowUserMenu] = useState(false);
+>>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Ambil riwayat dari localStorage saat pertama kali render
   useEffect(() => {
     const saved = localStorage.getItem("searchHistory");
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
+<<<<<<< HEAD
   // Simpan riwayat ke localStorage setiap kali berubah
+=======
+>>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
   useEffect(() => {
     localStorage.setItem("searchHistory", JSON.stringify(history));
   }, [history]);
@@ -30,12 +43,13 @@ export default function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
     if (!history.includes(search.trim())) {
       setHistory((prev) => [search.trim(), ...prev].slice(0, 5));
     }
-
-    console.log("Searching for:", search);
     setShowDropdown(false);
   };
 
@@ -52,9 +66,9 @@ export default function Navbar() {
     <nav className="bg-sky-300 shadow-md sticky top-0 z-50">
       <div className="flex items-center justify-between px-6 md:px-48 py-3">
         {/* Logo */}
-        <a href="/" className="flex items-center">
+        <Link to="/" className="flex items-center">
           <img src={Logo} alt="TechPoint" className="h-20 w-auto" />
-        </a>
+        </Link>
 
         {/* Search Form */}
         <div className="relative w-full max-w-md mx-6">
@@ -76,7 +90,6 @@ export default function Navbar() {
             </button>
           </form>
 
-          {/* Dropdown Riwayat */}
           {showDropdown && history.length > 0 && (
             <div className="absolute mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-full z-10">
               <div className="flex justify-between items-center px-4 py-2 border-b">
@@ -106,19 +119,22 @@ export default function Navbar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-5">
-          {/* Keranjang */}
-          <div className="relative cursor-pointer hover:scale-110 transition">
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="relative cursor-pointer hover:scale-110 transition">
             <FaShoppingCart size={22} />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
             )}
-          </div>
+          </Link>
 
           {/* User */}
           {isAuthenticated && user ? (
             <div
+<<<<<<< HEAD
               className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition"
               onClick={logout}>
               <FaUserCircle size={22} />
@@ -135,6 +151,44 @@ export default function Navbar() {
               className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">
               Login
             </a>
+=======
+              className="relative"
+              onMouseEnter={() => setShowUserMenu(true)}
+              onMouseLeave={() => setShowUserMenu(false)}>
+              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition">
+                <FaUserCircle size={22} />
+                <span className="hidden md:inline text-sm font-medium">
+                  {user.name}
+                </span>
+              </div>
+
+              {showUserMenu && (
+                <div className="absolute right-0 w-40 bg-white border rounded shadow-lg">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100">
+                    Profile Saya
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="block px-4 py-2 hover:bg-gray-100">
+                    Pesanan Saya
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500">
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-blue-500 text-white psx-4 py-2 rounded-full hover:bg-blue-600 transition">
+              Login
+            </Link>
+>>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
           )}
         </div>
       </div>

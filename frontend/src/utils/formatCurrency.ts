@@ -1,11 +1,8 @@
-// src/utils/formatCurrency.ts
-
-export function formatCurrency(amount: number): string {
-  if (isNaN(amount)) return "Rp 0";
-
-  return amount.toLocaleString("id-ID", {
+export const formatCurrency = (amount: number, currency = "IDR"): string => {
+  return new Intl.NumberFormat("id-ID", {
     style: "currency",
-    currency: "IDR",
+    currency: currency,
     minimumFractionDigits: 0,
-  });
-}
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
