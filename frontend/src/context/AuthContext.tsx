@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "@/services/api";
 
 interface User {
   id?: number;
@@ -31,30 +32,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const isAuthenticated = !!token;
 
+  // === 1. Fetch current user jika ada token ===
   useEffect(() => {
-    if (token) {
-      // TODO: fetch user profile dari backend Laravel
-      setUser({ name: "Bram Ahimsa", email: "bram@example.com" });
-    }
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get("/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }); // Laravel Sanctum: /api/user
+        setUser(res.data);
+      } catch (err) {
+        console.error("Gagal ambil profil:", err);
+        logout(); // token invalid → logout
+      }
+    };
+
+    if (token) fetchProfile();
   }, [token]);
 
+  // === 2. Login ===
   const login = async (data: { email: string; password: string }) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const fakeToken = "FAKE_TOKEN";
-    localStorage.setItem("token", fakeToken);
-    setToken(fakeToken);
-    setUser({ name: "Bram", email: data.email });
+    const res = await api.post("/login", data);
+
+    const token = res.data.access_token;
+    localStorage.setItem("token", token);
+    setToken(token);
+
+    // Ambil data user
+    const userRes = await api.get("/profile");
+    setUser(userRes.data);
   };
 
+  // === 3. Register ===
   const register = async (data: {
     nama: string;
     email: string;
     password: string;
   }) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Register data:", data);
+    const res = await api.post("/register", data);
+    return res.data;
   };
 
+  // === 4. Logout ===
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);

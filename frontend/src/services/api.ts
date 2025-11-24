@@ -21,7 +21,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Ambil token dari Local Storage, Context, atau state management lainnya
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
 
     if (token) {
       // Pastikan formatnya sesuai standar Bearer Token
