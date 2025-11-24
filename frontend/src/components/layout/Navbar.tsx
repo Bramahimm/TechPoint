@@ -135,7 +135,7 @@ export default function Navbar() {
                     Profile Saya
                   </Link>
                   <Link
-                    to="/sellet/dashboard"
+                    to="/seller"
                     className="block px-4 py-2 hover:bg-gray-100">
                     Toko Saya
                   </Link>

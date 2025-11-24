@@ -1,6 +1,8 @@
 // src/services/productService.ts
 import type { Product, ProductPayload } from "@/types/product";
 // import api from '@/services/api'; // Import instance Axios Anda
+import Produk1 from "@/assets/images/product4.webp";
+import Produk2 from "@/assets/images/product5.webp";
 
 const DUMMY_PRODUCTS: Product[] = [
   {
@@ -10,7 +12,7 @@ const DUMMY_PRODUCTS: Product[] = [
     stock: 5,
     description: "Laptop gaming high performance.",
     category: "Elektronik",
-    images: ["/assets/images/rog1.jpg", "/assets/images/rog2.jpg"],
+    images: [Produk1],
     status: "active",
     created_at: new Date(Date.now() - 86400000).toISOString(),
   },
@@ -21,7 +23,7 @@ const DUMMY_PRODUCTS: Product[] = [
     stock: 12,
     description: "Keyboard untuk pro player.",
     category: "Aksesoris",
-    images: ["/assets/images/keyboard.jpg"],
+    images: [Produk2],
     status: "active",
     created_at: new Date().toISOString(),
   },
