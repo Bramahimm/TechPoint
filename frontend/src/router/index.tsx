@@ -10,9 +10,12 @@ import CartPage from "@/features/shop/CartPage";
 import CheckoutPage from "@/features/shop/CheckoutPage";
 import OrderPage from "@/features/user/OrderPage";
 
-// ADMIN PAGES
+// ADMIN PAGES ← SEMUA IMPORT SUDAH DITAMBAHIN
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardPage from "@/features/admin/DashboardPage";
+import UsersPage from "@/features/admin/UsersPage";
+import ProductsPage from "@/features/admin/ProductsPage";
+import OrdersPage from "@/features/admin/OrdersPage";
 
 export default function AppRouter() {
   return (
@@ -31,7 +34,6 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/orders"
         element={
@@ -40,7 +42,6 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/cart"
         element={
@@ -49,7 +50,6 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/checkout"
         element={
@@ -59,12 +59,36 @@ export default function AppRouter() {
         }
       />
 
-      {/* ADMIN (tidak pakai ProtectedRoute dulu) */}
+      {/* ADMIN ROUTES */}
       <Route
         path="/admin/dashboard"
         element={
           <AdminLayout>
             <DashboardPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminLayout>
+            <UsersPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/products"
+        element={
+          <AdminLayout>
+            <ProductsPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <AdminLayout>
+            <OrdersPage />
           </AdminLayout>
         }
       />
