@@ -1,6 +1,6 @@
 // src/features/shop/CartPage.tsx
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 // Import useNavigate dari react-router-dom
 import { useNavigate } from "react-router-dom";
 // Import Layout yang benar
@@ -8,9 +8,8 @@ import MainLayout from "@/components/layout/MainLayout";
 // Import types
 import type { CartItemState } from "@/types/cart";
 // Import Services
-import { fetchCartItems, removeCartItem } from "@/services/cartService";
+import { fetchCartItems } from "@/services/cartService";
 // Import Utils
-import { formatCurrency } from "@/utils/formatCurrency";
 import handleError from "@/utils/handleError";
 
 // Import Komponen Cart

@@ -30,7 +30,7 @@ export default function LoginPage() {
       await login(form); // panggil login dari AuthContext
       navigate("/"); // redirect setelah login sukses
     } catch {
-      setError("login gagal, coba lagi!");
+      setError("Login gagal, Password atau Email salah!");
     } finally {
       setLoading(false);
     }
