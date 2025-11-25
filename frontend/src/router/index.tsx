@@ -1,27 +1,31 @@
 import { Routes, Route } from "react-router-dom";
-// Import semua komponen yang sudah ada
+
+// USER PAGES
 import HomePage from "@/features/shop/HomePage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
 import ProtectedRoute from "./ProtectedRoute";
 import ProfilePage from "@/features/user/ProfilePage";
-
 import CartPage from "@/features/shop/CartPage";
-// Import Halaman Checkout yang baru dibuat
 import CheckoutPage from "@/features/shop/CheckoutPage";
 import OrderPage from "@/features/user/OrderPage";
+
+// ADMIN PAGES ← SEMUA IMPORT SUDAH DITAMBAHIN
+import AdminLayout from "@/components/layout/AdminLayout";
+import DashboardPage from "@/features/admin/DashboardPage";
+import UsersPage from "@/features/admin/UsersPage";
+import ProductsPage from "@/features/admin/ProductsPage";
+import OrdersPage from "@/features/admin/OrdersPage";
 
 export default function AppRouter() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* PUBLIC */}
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Cart dan Checkout biasanya memerlukan login, jadi diletakkan di ProtectedRoute */}
-
-      {/* Protected Routes: Pengguna Harus Login */}
+      {/* PROTECTED USER */}
       <Route
         path="/profile"
         element={
@@ -46,8 +50,6 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
-
-      {/* ROUTE BARU: Halaman Checkout */}
       <Route
         path="/checkout"
         element={
@@ -57,8 +59,39 @@ export default function AppRouter() {
         }
       />
 
-      {/* Opsional: Tambahkan Route fallback 404 jika ada */}
-      {/* <Route path="*" element={<NotFoundPage />} /> */}
+      {/* ADMIN ROUTES */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminLayout>
+            <DashboardPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminLayout>
+            <UsersPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/products"
+        element={
+          <AdminLayout>
+            <ProductsPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <AdminLayout>
+            <OrdersPage />
+          </AdminLayout>
+        }
+      />
     </Routes>
   );
 }
