@@ -9,6 +9,7 @@ interface SubmitButtonProps {
   onSubmit: () => void;
 }
 
+
 const CheckoutSubmitButton: React.FC<SubmitButtonProps> = ({
   finalTotal,
   isPaymentValid,

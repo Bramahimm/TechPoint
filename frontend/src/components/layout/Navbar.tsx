@@ -135,6 +135,11 @@ export default function Navbar() {
                     Profile Saya
                   </Link>
                   <Link
+                    to="/seller"
+                    className="block px-4 py-2 hover:bg-gray-100">
+                    Toko Saya
+                  </Link>
+                  <Link
                     to="/orders"
                     className="block px-4 py-2 hover:bg-gray-100">
                     Pesanan Saya

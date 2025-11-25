@@ -4,8 +4,8 @@ import type { BankOption } from "@/utils/constants";
 import { BANK_OPTIONS } from "@/utils/constants";
 
 interface BankOptionsProps {
-  selectedBank: BankOption;
-  setSelectedBank: (bank: BankOption) => void;
+  selectedBank: BankOption | null;
+  setSelectedBank: (bank: BankOption | null) => void;
 }
 
 const PaymentBankOptions: React.FC<BankOptionsProps> = ({
