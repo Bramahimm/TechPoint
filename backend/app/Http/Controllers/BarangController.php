@@ -8,58 +8,85 @@ use Illuminate\Support\Facades\Auth;
 
 class BarangController extends Controller
 {
-    // Menampilkan semua barang milik toko user
+    // GET: /api/barang (Milik Toko Saya)
     public function index()
     {
-        $toko_id = Auth::user()->toko->id;
-        // $barangs = Barang::where('toko_id', $toko_id)->get();
-        // return view('barang.index', compact('barangs'));
+        $user = Auth::user();
+        
+        // Cek apakah user punya toko
+        if (!$user->toko) {
+            return response()->json([], 200);
+        }
+
+        $barangs = Barang::where('toko_id', $user->toko->id)->get();
+
+        // Format data untuk ProductCard.tsx
+        $data = $barangs->map(function ($barang) {
+            return [
+                'id' => $barang->id,
+                'name' => $barang->nama,
+                'price' => $barang->harga,
+                'stock' => $barang->stok,
+                'category' => $barang->kategori, // Asumsi kolom kategori string
+                'status' => $barang->stok > 0 ? 'active' : 'inactive', // Logic status sederhana
+                // Ubah string gambar tunggal jadi array agar sesuai ProductCard
+                'images' => $barang->gambar ? [$barang->gambar] : [] 
+            ];
+        });
+
+        return response()->json($data, 200);
     }
 
-    // Menampilkan form tambah barang
-    public function create()
-    {
-        $kategoris = Kategori::all();
-        // return view('barang.create', compact('kategoris'));
-    }
-
-    // Menyimpan barang baru
+    // POST: /api/barang (Tambah Barang Baru)
     public function store(Request $request)
     {
-        // Validasi
-        $toko_id = Auth::user()->toko->id;
-        // Barang::create([ 'toko_id' => $toko_id, ...data_lain ]);
-        // Redirect ke barang.index
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255',
+            'harga' => 'required|numeric',
+            'stok' => 'required|integer',
+            'kategori' => 'required|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi Gambar
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Upload Gambar
+        $pathGambar = null;
+        if ($request->hasFile('gambar')) {
+             // Simpan di storage/app/public/products
+            $path = $request->file('gambar')->store('products', 'public');
+            // Generate URL lengkap agar bisa diakses React
+            $pathGambar = url('storage/' . $path); 
+        }
+
+        $barang = Barang::create([
+            'toko_id' => Auth::user()->toko->id,
+            'nama' => $request->nama,
+            'harga' => $request->harga,
+            'stok' => $request->stok,
+            'kategori' => $request->kategori,
+            'gambar' => $pathGambar,
+        ]);
+
+        return response()->json(['message' => 'Produk berhasil ditambahkan', 'data' => $barang], 201);
     }
 
-    // Menampilkan detail satu barang (untuk pembeli)
-    public function show(Barang $barang)
+    // DELETE: /api/barang/{id}
+    public function destroy($id)
     {
-        // return view('barang.show', compact('barang'));
-    }
+        $barang = Barang::where('id', $id)->where('toko_id', Auth::user()->toko->id)->first();
 
-    // Menampilkan form edit barang
-    public function edit(Barang $barang)
-    {
-        // Otorisasi: Cek jika barang ini milik user
-        // if ($barang->toko_id !== Auth::user()->toko->id) { abort(403); }
-        // return view('barang.edit', compact('barang'));
-    }
+        if (!$barang) {
+            return response()->json(['message' => 'Produk tidak ditemukan'], 404);
+        }
 
-    // Update barang
-    public function update(Request $request, Barang $barang)
-    {
-        // Otorisasi
-        // Validasi
-        // $barang->update([...]);
-        // Redirect
-    }
+        // Hapus file gambar jika ada (opsional, tapi disarankan)
+        // Storage::disk('public')->delete(...) 
 
-    // Hapus barang
-    public function destroy(Barang $barang)
-    {
-        // Otorisasi
-        // $barang->delete();
-        // Redirect
+        $barang->delete();
+
+        return response()->json(['message' => 'Produk berhasil dihapus'], 200);
     }
 }

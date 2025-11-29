@@ -39,13 +39,18 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    // Toko (CRUD)
-    Route::apiResource('toko', TokoController::class);
+    // --- Module: Toko (Seller) ---
+    // Kita ubah dari apiResource menjadi manual agar URL-nya lebih jelas: '/toko/me'
+    Route::get('/toko/me', [TokoController::class, 'show']); // Cek toko milik user login
+    Route::post('/toko', [TokoController::class, 'store']);  // Buka toko baru
+    Route::put('/toko', [TokoController::class, 'update']);  // Update info toko (opsional)
 
-    // Barang (Sisanya: Create, Update, Delete)
-    Route::post('/barang', [BarangController::class, 'store']);
-    Route::put('/barang/{id}', [BarangController::class, 'update']);
-    Route::delete('/barang/{id}', [BarangController::class, 'destroy']);
+    // --- Module: Barang (Product Management) ---
+    // Menambahkan GET /barang agar React bisa meload daftar produk
+    Route::get('/barang', [BarangController::class, 'index']); // Get All My Products
+    Route::post('/barang', [BarangController::class, 'store']); // Create
+    Route::put('/barang/{id}', [BarangController::class, 'update']); // Update
+    Route::delete('/barang/{id}', [BarangController::class, 'destroy']); // Delete
 
     // Keranjang
     Route::apiResource('keranjang', KeranjangController::class);

@@ -8,44 +8,51 @@ use Illuminate\Support\Facades\Auth;
 
 class TokoController extends Controller
 {
-    // Menampilkan form untuk membuat toko (Fitur 'Membuka Toko')
-    public function create()
-    {
-        // return view('toko.create');
-    }
-
-    // Menyimpan toko baru ke database
-    public function store(Request $request)
-    {
-        // Validasi
-        // Toko::create([ 'user_id' => Auth::id(), ...data_lain ]);
-        // Update role user menjadi 'penjual'
-        // Redirect ke dashboard penjual
-    }
-
-    // Menampilkan dashboard toko milik user
+    // GET: /api/toko/me
+    // Cek apakah user sudah punya toko
     public function show()
     {
-        $toko = Auth::user()->toko;
-        // return view('toko.dashboard', compact('toko'));
+        $user = Auth::user();
+        
+        if (!$user->toko) {
+            return response()->json(['has_shop' => false, 'data' => null], 200);
+        }
+
+        return response()->json(['has_shop' => true, 'data' => $user->toko], 200);
     }
 
-    // Menampilkan form untuk edit toko
-    public function edit()
+    // POST: /api/toko
+    // Buat Toko Baru
+    public function store(Request $request)
     {
-        $toko = Auth::user()->toko;
-        // return view('toko.edit', compact('toko'));
-    }
+        $validator = Validator::make($request->all(), [
+            'nama_toko' => 'required|string|unique:tokos,nama_toko|max:255',
+            'alamat' => 'required|string',
+            'deskripsi' => 'nullable|string'
+        ]);
 
-    // Update data toko di database
-    public function update(Request $request)
-    {
-        $toko = Auth::user()->toko;
-        // Validasi
-        // $toko->update([...]);
-        // Redirect
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $user = Auth::user();
+
+        // Cek jika sudah punya toko
+        if ($user->toko) {
+            return response()->json(['message' => 'Anda sudah memiliki toko'], 400);
+        }
+
+        $toko = Toko::create([
+            'user_id' => $user->id,
+            'nama_toko' => $request->nama_toko,
+            'alamat' => $request->alamat,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        // Update Role User jadi penjual (jika pakai kolom role)
+        $user->role = 'penjual';
+        $user->save();
+
+        return response()->json(['message' => 'Toko berhasil dibuat', 'data' => $toko], 201);
     }
-    
-    // Method index, show(id), dan destroy mungkin tidak diperlukan
-    // jika user hanya bisa mengelola 1 tokonya sendiri
 }
