@@ -54,6 +54,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Keranjang
     Route::apiResource('keranjang', KeranjangController::class);
+    // Kategori
+    Route::get('/kategori', [KategoriController::class, 'index']);
+
+    // Route Manajemen Pesanan Seller
+    Route::get('/seller/orders', [SellerOrderController::class, 'index']);
+    Route::get('/seller/orders/{id}', [SellerOrderController::class, 'show']);
+    Route::post('/seller/orders/{id}/status', [SellerOrderController::class, 'updateStatus']);
 
     // Admin Dashboard
     Route::prefix('admin')->group(function () {
