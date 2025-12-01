@@ -14,7 +14,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   register: (data: any) => Promise<any>;
-  login: (data: any) => Promise<any>;
+  login: (data: { email: string; password: string }) => Promise<User>;
   logout: () => Promise<void>;
   resendVerification: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -34,20 +34,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (data: any) => {
     await getCsrf();
     const res = await api.post("/register", data);
+    await checkAuth(); // otomatis login setelah register (opsional)
     return res.data;
   };
 
-  const login = async (data: any) => {
+  // PERBAIKAN UTAMA: login sekarang RETURN user lengkap
+  const login = async (data: { email: string; password: string }): Promise<User> => {
     await getCsrf();
     try {
-      const res = await api.post("/login", data);
-      await checkAuth();
-      return res.data;
+      // 1. Login → dapat token dari Laravel Sanctum
+      await api.post("/login", data);
+
+      // 2. Ambil data user lengkap (termasuk role)
+      const userResponse = await api.get("/user");
+      const userData = userResponse.data as User;
+
+      console.log("USER DARI BACKEND:", userData);   // <--- TAMBAHIN INI
+    console.log("ROLE-nya adalah:", userData.role); // <--- DAN INI
+
+      // 3. Simpan ke state
+      setUser(userData);
+
+      // 4. Return user biar bisa dipakai di LoginPage
+      return userData;
     } catch (error: any) {
+      // Tangani error yang sering muncul
+      if (error.response?.status === 422) {
+        throw new Error("Email atau password salah");
+      }
       if (error.response?.status === 403) {
         throw new Error("EMAIL_NOT_VERIFIED");
       }
-      throw error;
+      throw new Error("Login gagal. Silakan coba lagi.");
     }
   };
 
@@ -56,8 +74,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
-    await api.post("/logout");
-    setUser(null);
+    try {
+      await api.post("/logout");
+    } catch (e) {
+      // ignore error logout
+    } finally {
+      setUser(null);
+      localStorage.removeItem("token"); // kalau kamu simpan manual
+    }
   };
 
   const checkAuth = async () => {
@@ -65,16 +89,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await api.get("/user");
       setUser(res.data);
     } catch (error: any) {
-      if (error.response?.status === 403) {
-        setUser(null);
-      } else {
-        setUser(null);
-      }
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Cek auth saat aplikasi pertama kali dibuka
   useEffect(() => {
     const initializeAuth = async () => {
 
@@ -120,11 +141,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         logout,
         resendVerification,
         checkAuth,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
