@@ -60,6 +60,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Kategori
     Route::get('/kategori', [KategoriController::class, 'index']);
 
+    // Transaksi
+    Route::post('/checkout', [TransaksiController::class, 'store']);
+    Route::get('/transaksi', [TransaksiController::class, 'index']);
+
     // Route Manajemen Pesanan Seller
     Route::get('/seller/orders', [SellerOrderController::class, 'index']);
     Route::get('/seller/orders/{id}', [SellerOrderController::class, 'show']);

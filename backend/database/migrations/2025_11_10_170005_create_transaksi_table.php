@@ -8,15 +8,20 @@ return new class extends Migration {
     public function up() {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id');
-            $table->uuid('toko_id');
-            $table->string('nomor_transaksi')->unique();
-            $table->decimal('total', 15, 2);
-            $table->enum('status', ['pending', 'paid', 'shipped', 'completed', 'cancelled']);
-            $table->timestamps();
+            
+            // Menggunakan foreignUuid (Lebih rapi)
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('toko_id')->constrained('toko')->onDelete('cascade');
+            
+            // Perbaikan Nama Kolom agar sesuai Controller
+            $table->string('invoice_number')->unique(); // Sebelumnya: nomor_transaksi
+            $table->decimal('total_harga', 15, 2);      // Sebelumnya: total
+            $table->enum('status', ['pending', 'paid', 'shipped', 'completed', 'cancelled'])->default('pending');
+            
+            // Tambahan Wajib
+            $table->string('alamat_pengiriman');
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('toko_id')->references('id')->on('toko')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
