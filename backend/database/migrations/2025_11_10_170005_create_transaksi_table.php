@@ -4,22 +4,23 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up() {
         Schema::create('transaksi', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('invoice_number')->unique();
-            $table->decimal('total_harga', 12, 2);
-            $table->string('status')->default('pending');
-            $table->timestamps(); // Sesuai ERD: created_at
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
+            $table->uuid('toko_id');
+            $table->string('nomor_transaksi')->unique();
+            $table->decimal('total', 15, 2);
+            $table->enum('status', ['pending', 'paid', 'shipped', 'completed', 'cancelled']);
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('toko_id')->references('id')->on('toko')->onDelete('cascade');
         });
     }
 
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('transaksi');
     }
 };

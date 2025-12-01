@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class KeranjangController extends Controller
 {
-    // GET: /api/keranjang
-    // Dipanggil oleh: fetchCartItems() di CartPage.tsx
     public function index()
     {
         $userId = Auth::id();
@@ -26,8 +24,8 @@ class KeranjangController extends Controller
                 'price' => $item->barang->harga,
                 'quantity' => $item->jumlah,
                 'stock' => $item->barang->stok,
-                'image' => $item->barang->gambar, // Pastikan ini URL gambar
-                'is_selected' => $item->is_selected, // Dari migrasi sebelumnya
+                'image' => $item->barang->gambar, 
+                'is_selected' => $item->is_selected, 
                 'varian' => $item->varian,
             ];
         });
@@ -35,8 +33,6 @@ class KeranjangController extends Controller
         return response()->json($data, 200);
     }
 
-    // POST: /api/keranjang
-    // Dipanggil saat tombol "Tambah ke Keranjang" ditekan
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -51,18 +47,15 @@ class KeranjangController extends Controller
 
         $userId = Auth::id();
 
-        // Cek apakah barang sudah ada di keranjang user?
         $existingItem = Keranjang::where('user_id', $userId)
             ->where('barang_id', $request->barang_id)
-            ->where('varian', $request->varian) // Cek varian juga
+            ->where('varian', $request->varian)
             ->first();
 
         if ($existingItem) {
-            // Update jumlah jika sudah ada
             $existingItem->jumlah += $request->jumlah;
             $existingItem->save();
         } else {
-            // Buat baru jika belum ada
             Keranjang::create([
                 'user_id' => $userId,
                 'barang_id' => $request->barang_id,

@@ -15,7 +15,7 @@ import CheckoutSummary from "@/components/checkout/CheckoutSummary";
 import CheckoutSubmitButton from "@/components/checkout/CheckoutSubmitButton";
 import PaymentMethodSelector from "@/components/checkout/PaymentMethodSelector";
 import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
-import CheckoutSkeleton from "@/components/checkout/CheckoutSkeleton"; // Tambahkan Skeleton
+import CheckoutSkeleton from "@/components/checkout/CheckoutSkeleton"; 
 
 // Asumsi Axios ada di services/api
 import api from "@/services/api";

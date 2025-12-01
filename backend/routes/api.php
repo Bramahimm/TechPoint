@@ -9,21 +9,31 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\SellerOrderController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Auth\GoogleAuthController; 
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
 // CSRF Cookie
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show'])
     ->middleware('web');
 
+
+Route::get('auth/google/redirect', [GoogleAuthController::class, 'redirect']);
+Route::get('auth/google/callback', [GoogleAuthController::class, 'callback']);
+
+Route::post('auth/google/token', [GoogleAuthController::class, 'handleToken']);
+
+
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/email/resend', [AuthController::class, 'resendVerification'])
     ->middleware('auth:sanctum'); // hanya yang sudah login tapi belum verif
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->name('verification.verify')
     ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
+    ->where('id', '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/user', [AuthController::class, 'userProfile']);
@@ -34,7 +44,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         return $request->user();
     });
 
-    // --- Module: Toko (Seller) ---
     Route::get('/toko/me', [TokoController::class, 'show']);   // Cek toko milik user login
     Route::post('/toko', [TokoController::class, 'store']);    // Buka toko baru
     Route::put('/toko', [TokoController::class, 'update']);    // Update info toko

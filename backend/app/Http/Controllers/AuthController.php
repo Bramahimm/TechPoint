@@ -26,10 +26,8 @@ class AuthController extends Controller {
       'role' => 'pembeli',
     ]);
 
-    // Kirim email verifikasi otomatis karena implements MustVerifyEmail
     event(new Registered($user));
 
-    // JANGAN Auth::login($user); → dihapus!
 
     return response()->json([
       'message' => 'Register berhasil. Silakan cek email untuk verifikasi.'
@@ -60,14 +58,15 @@ class AuthController extends Controller {
 
     $request->session()->regenerate();
 
+    // Di login() dan userProfile()
     return response()->json([
       'message' => 'Login berhasil',
       'user' => $user->only(['id', 'nama', 'email', 'role'])
     ]);
   }
 
-  public function verifyEmail(Request $request, $id, $hash) {
-    $user = User::findOrFail($id);
+  public function verifyEmail(Request $request, string $id, $hash) {
+    $user = User::where('id', $id)->firstOrFail(); // ← AMAN 100% untuk UUID
 
     if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
       return response()->json(['message' => 'Link tidak valid'], 400);
@@ -81,7 +80,6 @@ class AuthController extends Controller {
       event(new Verified($user));
     }
 
-    // Redirect ke frontend setelah verifikasi
     return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/login?verified=true');
   }
 
