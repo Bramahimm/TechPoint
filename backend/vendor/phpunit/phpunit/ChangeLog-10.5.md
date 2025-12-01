@@ -2,6 +2,13 @@
 
 All notable changes of the PHPUnit 10.5 release series are documented in this file using the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [10.5.59] - 2025-01-12
+
+### Changed
+
+* [#6338](https://github.com/sebastianbergmann/phpunit/pull/6338): Removed code from `PHPUnit\Runner\TestSuiteSorter` that was only used in the tests for this class
+* Updated list of deprecated PHP configuration settings for PHP 8.4, PHP 8.5, and PHP 8.6
+
 ## [10.5.58] - 2025-09-28
 
 ### Fixed
@@ -498,6 +505,7 @@ All notable changes of the PHPUnit 10.5 release series are documented in this fi
 
 * [#5563](https://github.com/sebastianbergmann/phpunit/issues/5563): `createMockForIntersectionOfInterfaces()` does not automatically register mock object for expectation verification
 
+[10.5.59]: https://github.com/sebastianbergmann/phpunit/compare/10.5.58...10.5.59
 [10.5.58]: https://github.com/sebastianbergmann/phpunit/compare/10.5.57...10.5.58
 [10.5.57]: https://github.com/sebastianbergmann/phpunit/compare/10.5.56...10.5.57
 [10.5.56]: https://github.com/sebastianbergmann/phpunit/compare/10.5.55...10.5.56
