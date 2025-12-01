@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetailTransaksi extends Model
 {
-    protected $table = 'detail_transaksi'; // Pastikan nama tabel sesuai
+    protected $table = 'detail_transaksi'; 
     protected $guarded = [];
 
     // Relasi ke Barang

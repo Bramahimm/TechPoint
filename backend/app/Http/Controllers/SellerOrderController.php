@@ -7,12 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\DetailTransaksi;
 use Illuminate\Support\Facades\auth;
 
-class SellerOrderController extends Controller
-{
-    public function index()
-    {
+class SellerOrderController extends Controller {
+    public function index() {
         $user = Auth::user();
-        
+
         if (!$user->toko) {
             return response()->json(['message' => 'Anda belum memiliki toko'], 403);
         }
@@ -23,18 +21,18 @@ class SellerOrderController extends Controller
         $orders = Transaksi::whereHas('detailTransaksi.barang', function ($query) use ($tokoId) {
             $query->where('toko_id', $tokoId);
         })
-        ->with(['user']) // Load data pembeli
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->with(['user']) // Load data pembeli
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        // Mapping data agar sesuai dengan frontend OrderListPage.tsx
+        // Mapping data biar sesuai dengan frontend OrderListPage.tsx
         $data = $orders->map(function ($order) {
             return [
                 'id' => $order->id,
                 'invoice_number' => $order->invoice_code ?? 'INV-' . $order->id,
-                'customer_name' => $order->user->nama ?? 'Guest', // Sesuaikan nama kolom di tabel users
+                'customer_name' => $order->user->nama ?? 'Guest',
                 'total_amount' => $order->total_harga,
-                'status' => $order->status, // Pastikan value status sesuai dengan frontend
+                'status' => $order->status,
                 'created_at' => $order->created_at,
             ];
         });
@@ -42,10 +40,7 @@ class SellerOrderController extends Controller
         return response()->json($data, 200);
     }
 
-    // GET: /api/seller/orders/{id}
-    // Menampilkan detail pesanan spesifik
-    public function show($id)
-    {
+    public function show($id) {
         $tokoId = Auth::user()->toko->id;
 
         // Ambil transaksi spesifik
@@ -64,7 +59,7 @@ class SellerOrderController extends Controller
                 'id' => $detail->id,
                 'product_name' => $detail->barang->nama,
                 'quantity' => $detail->jumlah,
-                'price' => $detail->harga_satuan, // Pastikan ada kolom ini di detail_transaksi
+                'price' => $detail->harga_satuan,
             ];
         });
 
@@ -74,7 +69,7 @@ class SellerOrderController extends Controller
             'status' => $order->status,
             'customer_name' => $order->user->nama,
             'shipping_address' => $order->alamat_pengiriman ?? 'Alamat tidak tersedia',
-            'total_amount' => $order->total_harga, // Note: ini total global transaksi, mungkin perlu dihitung ulang per toko jika multi-vendor
+            'total_amount' => $order->total_harga,
             'created_at' => $order->created_at,
             'items' => $mappedItems->values(),
         ];
@@ -82,16 +77,14 @@ class SellerOrderController extends Controller
         return response()->json($response, 200);
     }
 
-    // POST: /api/seller/orders/{id}/status
-    // Update Status Pesanan
-    public function updateStatus(Request $request, $id)
-    {
+
+    public function updateStatus(Request $request, $id) {
         $request->validate([
             'status' => 'required|string|in:Menunggu Konfirmasi,Diproses,Dikirim,Selesai,Dibatalkan'
         ]);
 
         $order = Transaksi::findOrFail($id);
-        
+
         // Update status
         $order->status = $request->status;
         $order->save();
