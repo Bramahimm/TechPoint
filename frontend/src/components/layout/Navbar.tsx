@@ -125,8 +125,7 @@ export default function Navbar() {
               {/* CONTAINER UTAMA — hover di sini semua aman */}
               <div
                 className="flex items-center gap-2 cursor-pointer"
-                onClick={() => setShowUserMenu(true)}
-                >
+                onClick={() => setShowUserMenu(true)}>
                 <FaUserCircle size={26} className="text-white drop-shadow" />
                 <span className="hidden md:inline text-white font-semibold drop-shadow">
                   Hi, {user?.nama?.split(" ")[0] || "User"}
@@ -172,7 +171,7 @@ export default function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="bg-white text-blue-600 font-bold px-8 py-2 rounded-xl hover:bg-gray-100 transition shadow-md">
+              className="text-orange-700 font-semibold px-8 py-2 rounded-xl transition-colors duration-200 hover:text-orange-500">
               Login
             </Link>
           )}

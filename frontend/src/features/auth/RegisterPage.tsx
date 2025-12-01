@@ -127,7 +127,7 @@ export default function RegisterPage() {
             </Button>
             <p className="text-sm text-center mt-4">
               Sudah punya akun?{" "}
-              <Link to="/login" className="text-blue-600 hover:underline">
+              <Link to="/login" className="text-blue-600 font-bold hover:underline">
                 Login
               </Link>
             </p>
