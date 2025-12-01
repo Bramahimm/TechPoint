@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
-import Footer from "@/components/layout/Footer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import TechPointLogo from "@/assets/images/Logo_TechPoint.webp";
+import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/context/AuthContext";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 
@@ -12,63 +11,73 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const [showResend, setShowResend] = useState(false);
+
+  const { login, resendVerification } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setShowResend(false);
 
     try {
-      const user = await login(form); // sekarang langsung dapat object user + role
-
-      // Redirect berdasarkan role
-      if (user.role === "admin") {
-        navigate("/admin/dashboard"); // sesuaikan path kalau beda
-      } else if (user.role === "penjual") {
-        navigate("/seller/dashboard"); // kalau kamu punya
-      } else {
-        navigate("/"); // user biasa → homepage
-      }
+      await login(form);
+      navigate("/dashboard");
     } catch (err: any) {
       if (err.message === "EMAIL_NOT_VERIFIED") {
-        setError("Email belum diverifikasi. Cek inbox atau folder spam.");
+        setError("Email belum diverifikasi. Silakan cek email Anda.");
+        setShowResend(true);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
       } else {
-        setError(err.message || "Login gagal. Email atau password salah.");
+        setError("Email atau password salah");
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleResend = async () => {
+    try {
+      await resendVerification();
+      setError("Link verifikasi telah dikirim ulang ke email Anda!");
+      setShowResend(false);
+    } catch {
+      setError("Gagal mengirim ulang. Coba lagi nanti.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow flex justify-center bg-orange-400 px-6 md:px-20 py-16">
+      <div className="flex-grow flex justify-center bg-orange-500 px-6 md:px-20 py-16">
         <div className="flex w-full max-w-7xl items-center justify-between gap-10">
-          {/* Kiri */}
+          {/* Kiri - Branding */}
           <div className="hidden md:flex flex-col items-center text-white w-1/2">
             <img
               src={TechPointLogo}
               alt="TechPoint"
-              className="w-64 mb-6 drop-shadow-lg"
+              className="w-64 mb-6 drop-shadow-2xl"
             />
-            <p className="text-2xl">Temukan Barang Elektronik Murah</p>
+            <h1 className="text-4xl font-bold mb-3 drop-shadow-md">
+              Selamat Datang di TechPoint
+            </h1>
+            <p className="text-xl text-center">
+              Temukan Barang Elektronik Murah & Berkualitas
+            </p>
           </div>
 
-          {/* Form kanan */}
+          {/* Form Login */}
           <form
-            className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md"
-            onSubmit={handleSubmit}>
-            <h2 className="text-2xl font-bold mb-6 text-center text-black">
-              Login TechPoint
+            onSubmit={handleSubmit}
+            className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md">
+            <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
+              Masuk ke Akun Anda
             </h2>
             {/* Pesan Error / Sukses */}
             {error && (
@@ -100,6 +109,7 @@ export default function LoginPage() {
               value={form.email}
               onChange={handleChange}
               required
+              className="mb-4"
             />
             <Input
               type="password"
@@ -143,8 +153,10 @@ export default function LoginPage() {
             </div>
             <p className="text-center mt-8 text-gray-600 border-t pt-6">
               Belum punya akun?{" "}
-              <Link to="/register" className="text-blue-600 hover:underline">
-                Register
+              <Link
+                to="/register"
+                className="text-orange-600 font-bold hover:underline">
+                Register Sekarang
               </Link>
             </p>
           </form>
