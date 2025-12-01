@@ -59,11 +59,9 @@ class AuthController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // ⚠️ BAGIAN VERIFIKASI EMAIL (Punya Teman Anda)
-        // Saya komen (matikan) dulu supaya Anda bisa tes login di Thunder Client.
-        // Nanti kalau aplikasi sudah siap rilis, hapus tanda komentar (/* ... */) ini.
+
+        // verivikasi email
         
-        /*
         if (!$user->hasVerifiedEmail()) {
             // Hapus token yang mungkin terbuat (logout paksa)
             $user->tokens()->delete(); 
@@ -71,10 +69,7 @@ class AuthController extends Controller
                 'message' => 'Email belum diverifikasi. Silakan cek email atau klik Resend Verification.'
             ], 403);
         }
-        */
-
-        // ⚠️ BAGIAN SESSION (Punya Teman Anda - Tidak dipakai di API)
-        // $request->session()->regenerate(); 
+    
 
         // ✨ BAGIAN TOKEN (Pengganti Session untuk API)
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -95,10 +90,6 @@ class AuthController extends Controller
             $request->user()->currentAccessToken()->delete();
         }
 
-        // Punya Teman (Session Style) - Tidak perlu dipakai di API
-        // Auth::guard('web')->logout();
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logout berhasil']);
     }
