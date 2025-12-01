@@ -59,5 +59,16 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Admin Dashboard
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
+        // --- DI DALAM Route::prefix('admin')->group(function () { ---
+        Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index']);
+        Route::delete('/users/{id}', [App\Http\Controllers\Admin\UserController::class, 'destroy']);
+// Opsional: update role
+        Route::patch('/users/{id}/role', [App\Http\Controllers\Admin\UserController::class, 'updateRole']);
+        Route::prefix('admin')->middleware('admin')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+        Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index']);
+        Route::delete('/users/{id}', [App\Http\Controllers\Admin\UserController::class, 'destroy']);
+        Route::patch('/users/{id}/role', [App\Http\Controllers\Admin\UserController::class, 'updateRole']);
+});
     });
 });
