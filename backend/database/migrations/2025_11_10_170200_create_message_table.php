@@ -4,21 +4,32 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-   public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         Schema::create('message', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('conversation_id')->constrained('conversation')->onDelete('cascade');
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade'); // Pengirim pesan
+            // Primary key UUID
+            $table->uuid('id')->primary();
+
+            // conversation_id → UUID (karena tabel conversation juga pakai UUID)
+            $table->uuid('conversation_id');
+            $table->foreign('conversation_id')
+                ->references('id')
+                ->on('conversation')
+                ->onDelete('cascade');
+
+            // sender_id → UUID (karena tabel users pakai UUID)
+            $table->uuid('sender_id');
+            $table->foreign('sender_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
             $table->text('pesan');
-            $table->timestamps(); // Sesuai ERD: created_at
+            $table->timestamps();
         });
     }
 
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('message');
     }
 };
