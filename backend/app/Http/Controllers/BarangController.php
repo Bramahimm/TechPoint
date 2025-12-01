@@ -49,8 +49,8 @@ class BarangController extends Controller
             'nama' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'stok' => 'required|integer',
-            'deskripsi' => 'nullable|string', // Tambahkan deskripsi jika ada di DB
-            'kategori_id' => 'required|exists:kategori,id', // <--- PERBAIKAN 2: Harus kategori_id
+            'deskripsi' => 'nullable|string', 
+            'kategori_id' => 'required|exists:kategori,id', 
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 

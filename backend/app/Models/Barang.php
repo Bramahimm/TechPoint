@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // <--- WAJIB ADA
+use Illuminate\Database\Eloquent\Concerns\HasUuids; 
 
 class Barang extends Model
 {
-    use HasFactory, HasUuids; // <--- WAJIB DIPASANG
+    use HasFactory, HasUuids; 
 
-    // Agar Laravel tahu ID-nya bukan angka
     public $incrementing = false;
     protected $keyType = 'string';
     
@@ -23,7 +22,7 @@ class Barang extends Model
         'deskripsi',
         'harga',
         'stok',
-        'gambar', // Jangan lupa tambahkan ini agar upload gambar berhasil
+        'gambar', 
     ];
 
     // Relasi: Barang ini milik satu Toko

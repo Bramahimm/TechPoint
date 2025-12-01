@@ -17,9 +17,9 @@ class ChatController extends Controller
         $user = Auth::user();
 
         // Cari percakapan dimana user terlibat (sebagai pembeli ATAU pemilik toko)
-        // Logic sederhana: anggap user sebagai pembeli dulu
+        // anggap user sebagai pembeli dulu
         $conversations = Conversation::with(['toko', 'message' => function($query) {
-                $query->latest()->first(); // Ambil pesan terakhir untuk preview
+                $query->latest()->first(); 
             }])
             ->where('user_id', $user->id)
             ->get();

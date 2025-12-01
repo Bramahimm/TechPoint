@@ -64,23 +64,23 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/toko', [TokoController::class, 'store']);
     Route::put('/toko', [TokoController::class, 'update']);
 
-    // --- Barang (Product Management) ---
-    // Hanya bisa create/delete jika sudah punya toko (logic di controller)
+    // --- Barang ---
+    // Hanya bisa create/delete jika sudah punya toko (logika di controller)
     Route::post('/barang', [BarangController::class, 'store']);
     Route::put('/barang/{id}', [BarangController::class, 'update']);
     Route::delete('/barang/{id}', [BarangController::class, 'destroy']);
 
-    // --- Keranjang (Cart) ---
+    // --- Keranjang ---
     Route::get('/keranjang', [KeranjangController::class, 'index']);
     Route::post('/keranjang', [KeranjangController::class, 'store']);
     Route::put('/keranjang/{id}', [KeranjangController::class, 'update']);
     Route::delete('/keranjang/{id}', [KeranjangController::class, 'destroy']);
 
-    // --- Transaksi (Buyer Side) ---
+    // --- Transaksi  ---
     Route::post('/checkout', [TransaksiController::class, 'store']);
     Route::get('/transaksi', [TransaksiController::class, 'index']);
 
-    // --- Ulasan (Reviews) ---
+    // --- Ulasan ---
     Route::post('/ulasan', [UlasanController::class, 'store']);
 
     // --- Chat ---
@@ -97,7 +97,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     });
 
     // --- ADMIN DASHBOARD ---
-    // Tambahkan middleware 'admin' jika Anda sudah membuat middleware khusus admin
+
     Route::prefix('admin')->middleware('admin')->group(function () {
         // Dashboard Stats
         Route::get('/dashboard', [DashboardController::class, 'index']);

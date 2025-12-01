@@ -20,7 +20,6 @@ class SellerOrderController extends Controller {
         $tokoId = $user->toko->id;
 
         // Ambil Transaksi yang memiliki toko_id sesuai toko user
-        // (Karena di tabel transaksi sekarang sudah ada kolom toko_id, jadi lebih mudah)
         $orders = Transaksi::where('toko_id', $tokoId)
             ->with(['user']) // Load data pembeli
             ->orderBy('created_at', 'desc')

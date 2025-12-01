@@ -25,7 +25,7 @@ class UlasanController extends Controller
 
         $user = Auth::user();
 
-        // Cek apakah user sudah pernah review barang ini (Opsional: 1 user 1 review per barang)
+        // Cek apakah user sudah pernah review barang ini
         $existingReview = Ulasan::where('user_id', $user->id)
             ->where('barang_id', $request->barang_id)
             ->first();
