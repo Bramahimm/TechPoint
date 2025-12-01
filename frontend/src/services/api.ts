@@ -1,12 +1,11 @@
-// src/services/api.ts → WAJIB 100% SEPERTI INI!
 import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
   withCredentials: true,
   headers: {
-    "Content-Type": "application/json", // WAJIB ADA!
-    Accept: "application/json", // WAJIB ADA!
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 

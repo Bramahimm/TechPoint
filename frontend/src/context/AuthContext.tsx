@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "@/services/api";
+import { useNavigate } from "react-router-dom";
 
 interface User {
-  id: number;
+  id: string;
   nama: string;
   email: string;
   role: string;
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const getCsrf = async () => {
     await api.get("/sanctum/csrf-cookie");
@@ -74,8 +76,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    const initializeAuth = async () => {
+
+      if (user) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await api.get("/user");
+        setUser(res.data);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const loginMethod = urlParams.get("login");
+
+        if (loginMethod === "google") {
+          window.history.replaceState({}, "", window.location.pathname);
+          navigate("/dashboard", { replace: true });
+        }
+      } catch (error: any) {
+        setUser(null);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("error") === "google_failed") {
+          window.history.replaceState({}, "", "/login");
+          navigate("/login", { replace: true });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, [user, navigate]);
 
   return (
     <AuthContext.Provider

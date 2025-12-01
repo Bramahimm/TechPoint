@@ -13,12 +13,9 @@ const SidebarAdmin = () => {
   ];
 
   const handleLogout = () => {
-    // Hapus token dari localStorage (sesuaikan key kalau kamu simpan di tempat lain)
     localStorage.removeItem("token");
-    localStorage.removeItem("user"); // kalau kamu simpan data user juga
+    localStorage.removeItem("user");
 
-    // Optional: panggil API logout kalau mau invalidate token di backend
-    // axios.post('/api/logout') gak wajib karena Sanctum plain token gak perlu
 
     // Redirect ke halaman login
     navigate("/login", { replace: true });

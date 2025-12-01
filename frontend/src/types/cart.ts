@@ -1,17 +1,17 @@
-// Definisi dasar item keranjang dari API Laravel
+// Representasi item keranjang yang dikirim dari API Laravel
 export interface CartItem {
   id: number;
-  product_id: number; // Tambahkan product_id untuk identifikasi
+  product_id: number;
   name: string;
-  price: number; // Harga setelah diskon (harga final)
-  original_price?: number; // Harga coret (sebelum diskon)
+  price: number;
+  original_price?: number;
   quantity: number;
-  image: string; // URL gambar produk
-  variant?: string; // Varian produk misalnya warna biru, Ukuran L
-  discount_percent?: number; // Persentase diskon opsional
+  image: string;
+  variant?: string;
+  discount_percent?: number;
 }
 
-// taambahan untuk state lokal di React
+// Versi item keranjang untuk state React
 export interface CartItemState extends CartItem {
-    isChecked: boolean; // Untuk kontrol checkbox di UI
+  isChecked: boolean;
 }

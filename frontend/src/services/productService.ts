@@ -1,6 +1,5 @@
 // src/services/productService.ts
 import type { Product, ProductPayload } from "@/types/product";
-// import api from '@/services/api'; // Import instance Axios disini
 import Produk1 from "@/assets/images/product4.webp";
 import Produk2 from "@/assets/images/product5.webp";
 

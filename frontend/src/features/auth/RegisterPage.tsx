@@ -16,7 +16,7 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const { register } = useAuth(); // ambil register dari AuthContext
+  const { register } = useAuth(); // ambil fungsi register dari AuthContext
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -54,6 +54,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow flex justify-center bg-orange-500 px-6 md:px-20 py-16">
         <div className="flex w-full max-w-7xl items-center justify-between gap-10">
+          {/* Bagian kiri: Logo & teks (hanya muncul di desktop) */}
           <div className="hidden md:flex flex-col items-center text-white w-1/2">
             <img
               src={TechPointLogo}
@@ -63,13 +64,15 @@ export default function RegisterPage() {
             <p className="text-2xl">Temukan Barang Elektronik Murah</p>
           </div>
 
-          {/* Form */}
+          {/* Form registrasi */}
           <form
             onSubmit={handleSubmit}
             className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
             <h2 className="text-3xl font-bold mb-6 text-center text-black">
               Register TechPoint
             </h2>
+
+            {/* Pesan sukses / error */}
             {message && (
               <>
                 {message.includes("berhasil") ? (
@@ -90,6 +93,8 @@ export default function RegisterPage() {
                 )}
               </>
             )}
+
+            {/* Input form */}
             <Input
               name="nama"
               type="text"
@@ -119,21 +124,29 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
             />
+
+            {/* Tombol submit */}
             <Button
               type="submit"
               className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 font-bold"
               disabled={loading}>
               {loading ? "Memproses..." : "Register"}
             </Button>
+
+            {/* Link ke login */}
             <p className="text-sm text-center mt-4">
               Sudah punya akun?{" "}
-              <Link to="/login" className="text-blue-600 font-bold hover:underline">
+              <Link
+                to="/login"
+                className="text-blue-600 font-bold hover:underline">
                 Login
               </Link>
             </p>
           </form>
         </div>
       </div>
+
+      {/* Footer halaman */}
       <Footer />
     </div>
   );

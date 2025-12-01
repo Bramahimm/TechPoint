@@ -12,11 +12,11 @@ import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const { user, logout } = useAuth(); // HANYA AMBIL user & logout
+  const { user, logout } = useAuth(); 
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [cartCount] = useState(2); // nanti diganti dari context/state
+  const [cartCount] = useState(2);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -47,7 +47,6 @@ export default function Navbar() {
     setHistory((prev) => prev.filter((item) => item !== term));
   };
 
-  // CEK APAKAH USER SUDAH LOGIN → PAKAI user !== null
   const isLoggedIn = user !== null;
 
   return (
@@ -132,7 +131,7 @@ export default function Navbar() {
                 </span>
               </div>
 
-              {/* DROPDOWN — JANGAN LUPA TAMBAHKAN onMouseEnter & onMouseLeave JUGA! */}
+            
               {showUserMenu && (
                 <div
                   className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
