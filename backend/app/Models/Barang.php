@@ -14,9 +14,7 @@ class Barang extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     
-    protected $table = 'barangs'; // Cek di database, biasanya plural 'barangs' atau singular 'barang'?
-    // Sesuai migrasi Anda: 'barang' (singular). Jadi kita paksa nama tabelnya:
-    // (Jika di migrasi namanya Schema::create('barang', ...))
+    protected $table = 'barang'; 
 
     protected $fillable = [
         'toko_id',

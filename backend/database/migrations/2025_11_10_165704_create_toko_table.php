@@ -8,16 +8,23 @@ return new class extends Migration {
     public function up() {
         Schema::create('toko', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id')->unique(); // satu user satu toko
+            
+            // Kita pakai foreignUuid + unique (karena 1 user cuma boleh punya 1 toko)
+            $table->foreignUuid('user_id')
+                  ->unique() 
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
             $table->string('nama_toko');
+            
+            // --- INI YANG TADI HILANG ---
+            $table->text('alamat'); 
+            $table->string('no_telp')->nullable();
+            // ----------------------------
+
             $table->text('deskripsi')->nullable();
             $table->string('logo')->nullable();
             $table->timestamps();
-
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
         });
     }
 
