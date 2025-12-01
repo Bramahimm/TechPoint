@@ -36,6 +36,15 @@ export default function AppRouter() {
         }
       />
       <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/orders"
         element={
           <ProtectedRoute>

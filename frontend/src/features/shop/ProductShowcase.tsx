@@ -34,7 +34,6 @@ export default function ProductShowcase() {
                   {formatCurrency(product.price)}
                 </p>
                 <div className="flex items-center mt-2 text-yellow-400 text-sm">
-                  {/* Pastikan Anda sudah mengimpor FaStar */}
                   <FaStar /> <span className="ml-1">{product.rating}</span>
                 </div>
               </div>

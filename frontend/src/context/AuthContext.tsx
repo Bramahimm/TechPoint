@@ -1,96 +1,101 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import api from "@/services/api";
 
 interface User {
-  id?: number;
-  name: string;
+  id: number;
+  nama: string;
   email: string;
+  role: string;
+  email_verified_at?: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  login: (data: { email: string; password: string }) => Promise<void>;
-  register: (data: {
-    nama: string;
-    email: string;
-    password: string;
-  }) => Promise<void>;
-  logout: () => void;
+  isLoading: boolean;
+  register: (data: any) => Promise<any>;
+  login: (data: any) => Promise<any>;
+  logout: () => Promise<void>;
+  resendVerification: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
+  const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!token;
-
-  // === 1. Fetch current user jika ada token ===
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await api.get("/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }); // Laravel Sanctum: /api/user
-        setUser(res.data);
-      } catch (err) {
-        console.error("Gagal ambil profil:", err);
-        logout(); // token invalid → logout
-      }
-    };
-
-    if (token) fetchProfile();
-  }, [token]);
-
-  // === 2. Login ===
-  const login = async (data: { email: string; password: string }) => {
-    const res = await api.post("/login", data);
-
-    const token = res.data.access_token;
-    localStorage.setItem("token", token);
-    setToken(token);
-
-    // Ambil data user
-    const userRes = await api.get("/profile");
-    setUser(userRes.data);
+  const getCsrf = async () => {
+    await api.get("/sanctum/csrf-cookie");
   };
 
-  // === 3. Register ===
-  const register = async (data: {
-    nama: string;
-    email: string;
-    password: string;
-  }) => {
+  const register = async (data: any) => {
+    await getCsrf();
     const res = await api.post("/register", data);
     return res.data;
   };
 
-  // === 4. Logout ===
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+  const login = async (data: any) => {
+    await getCsrf();
+    try {
+      const res = await api.post("/login", data);
+      await checkAuth();
+      return res.data;
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        throw new Error("EMAIL_NOT_VERIFIED");
+      }
+      throw error;
+    }
+  };
+
+  const resendVerification = async () => {
+    await api.post("/email/resend");
+  };
+
+  const logout = async () => {
+    await api.post("/logout");
     setUser(null);
   };
 
+  const checkAuth = async () => {
+    try {
+      const res = await api.get("/user");
+      setUser(res.data);
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        setUser(null);
+      } else {
+        setUser(null);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user, token, isAuthenticated, login, register, logout }}>
+      value={{
+        user,
+        isLoading,
+        register,
+        login,
+        logout,
+        resendVerification,
+        checkAuth,
+      }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return context;
 };

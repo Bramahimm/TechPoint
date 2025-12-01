@@ -74,7 +74,7 @@ export const removeCartItem = async (id: number): Promise<void> => {
 
 /**
  * Mengubah kuantitas item keranjang (Mock Async).
- * Fungsi ini dibutuhkan oleh CartItemCard.tsx yang Anda buat sebelumnya.
+ * Fungsi ini dibutuhkan oleh CartItemCard.tsx yang dibuat sebelumnya.
  */
 export const updateCartItemQuantity = async (
   id: number,

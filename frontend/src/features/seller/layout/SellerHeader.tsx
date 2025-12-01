@@ -20,12 +20,11 @@ const SellerHeader: React.FC = () => {
         <span className="text-sm text-gray-600 hidden sm:block">
           Selamat Datang, Penjual!
         </span>
-        <button
-          onClick={() => alert("Logout Seller...")}
+        <Link to={"/"}
           className="flex items-center space-x-1 text-sm text-gray-500 hover:text-red-500 transition">
           <LogOut className="w-4 h-4" />
           <span>Keluar</span>
-        </button>
+        </Link>
       </div>
     </header>
   );

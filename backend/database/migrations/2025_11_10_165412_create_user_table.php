@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->default('pembeli'); // Contoh: pembeli, penjual
+            $table->string('role')->default('pengguna'); // Contoh: pembeli, penjual
             $table->timestamp('email_verified_at')->nullable(); 
             $table->rememberToken(); 
             $table->timestamps(); // Ini akan membuat created_at & updated_at

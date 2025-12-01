@@ -122,6 +122,8 @@ const ProductFormPage: React.FC = () => {
     );
   }
 
+
+
   return (
     <div className="space-y-6 bg-white p-8 rounded-xl shadow-lg">
       <h2 className="text-3xl font-bold text-gray-900 border-b pb-4">

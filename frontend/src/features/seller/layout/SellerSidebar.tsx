@@ -1,15 +1,13 @@
 // src/features/seller/layout/SellerSidebar.tsx
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Package, ShoppingCart, Plus } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart } from "lucide-react";
 
 const SELLER_MENU = [
   { name: "Dashboard", path: "/seller/dashboard", icon: LayoutDashboard },
   { name: "Produk Saya", path: "/seller/products", icon: Package },
-  { name: "Tambah Produk", path: "/seller/products/add", icon: Plus },
   { name: "Pesanan Masuk", path: "/seller/orders", icon: ShoppingCart },
 ];
-
 const SellerSidebar: React.FC = () => {
   return (
     <aside className="w-60 bg-white border-r p-4 hidden md:block flex-shrink-0">
