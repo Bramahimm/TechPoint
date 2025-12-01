@@ -8,6 +8,9 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\SellerOrderController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\UlasanController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\GoogleAuthController; 
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
@@ -35,6 +38,11 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed', 'throttle:6,1'])
     ->where('id', '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}');
 
+
+// ulasan bisa di liat siapa saja
+Route::get('/barang/{id}/ulasan', [UlasanController::class, 'index']);
+
+
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -57,6 +65,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Keranjang
     Route::apiResource('keranjang', KeranjangController::class);
 
+    //ulasan
+    Route::post('/ulasan', [UlasanController::class, 'store']);
+
     // Kategori
     Route::get('/kategori', [KategoriController::class, 'index']);
 
@@ -64,10 +75,18 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/checkout', [TransaksiController::class, 'store']);
     Route::get('/transaksi', [TransaksiController::class, 'index']);
 
-    // Route Manajemen Pesanan Seller
-    Route::get('/seller/orders', [SellerOrderController::class, 'index']);
-    Route::get('/seller/orders/{id}', [SellerOrderController::class, 'show']);
-    Route::post('/seller/orders/{id}/status', [SellerOrderController::class, 'updateStatus']);
+    // Chat
+    Route::get('/chat', [ChatController::class, 'index']);
+    Route::post('/chat/start', [ChatController::class, 'start']);
+    Route::get('/chat/{id}', [ChatController::class, 'show']);
+    Route::post('/chat/{id}/reply', [ChatController::class, 'reply']);
+
+    // Route Khusus Penjual (Seller)
+    Route::prefix('seller')->group(function () {
+        Route::get('/orders', [SellerOrderController::class, 'index']);
+        Route::get('/orders/{id}', [SellerOrderController::class, 'show']);
+        Route::put('/orders/{id}/status', [SellerOrderController::class, 'updateStatus']);
+    });
 
     // Admin Dashboard
     Route::prefix('admin')->group(function () {

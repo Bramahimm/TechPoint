@@ -4,34 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
-use App\Models\DetailTransaksi;
-use Illuminate\Support\Facades\auth;
+use Illuminate\Support\Facades\Auth;
 
 class SellerOrderController extends Controller {
+    
+    // GET /api/seller/orders (Lihat semua pesanan yang masuk ke toko saya)
     public function index() {
         $user = Auth::user();
 
+        // Cek apakah user punya toko
         if (!$user->toko) {
             return response()->json(['message' => 'Anda belum memiliki toko'], 403);
         }
 
         $tokoId = $user->toko->id;
 
-        // Ambil Transaksi yang memiliki DetailTransaksi -> Barang -> milik Toko ini
-        $orders = Transaksi::whereHas('detailTransaksi.barang', function ($query) use ($tokoId) {
-            $query->where('toko_id', $tokoId);
-        })
+        // Ambil Transaksi yang memiliki toko_id sesuai toko user
+        // (Karena di tabel transaksi sekarang sudah ada kolom toko_id, jadi lebih mudah)
+        $orders = Transaksi::where('toko_id', $tokoId)
             ->with(['user']) // Load data pembeli
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Mapping data biar sesuai dengan frontend OrderListPage.tsx
+        // Mapping data biar sesuai dengan frontend
         $data = $orders->map(function ($order) {
             return [
                 'id' => $order->id,
-                'invoice_number' => $order->invoice_code ?? 'INV-' . $order->id,
-                'customer_name' => $order->user->nama ?? 'Guest',
-                'total_amount' => $order->total_harga,
+                'invoice_number' => $order->invoice_number, // Sudah pakai invoice_number
+                'customer_name' => $order->user ? $order->user->nama : 'Guest',
+                'total_amount' => $order->total_harga, // Sudah pakai total_harga
                 'status' => $order->status,
                 'created_at' => $order->created_at,
             ];
@@ -40,50 +41,66 @@ class SellerOrderController extends Controller {
         return response()->json($data, 200);
     }
 
+    // GET /api/seller/orders/{id} (Detail Pesanan)
     public function show($id) {
-        $tokoId = Auth::user()->toko->id;
+        $user = Auth::user();
 
-        // Ambil transaksi spesifik
-        $order = Transaksi::with(['user', 'detailTransaksi.barang'])
+        if (!$user->toko) {
+            return response()->json(['message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil transaksi spesifik milik toko ini
+        $order = Transaksi::with(['user', 'details.barang']) // Pakai relasi 'details'
             ->where('id', $id)
-            ->firstOrFail();
+            ->where('toko_id', $user->toko->id) // Pastikan hanya bisa lihat order tokonya sendiri
+            ->first();
 
-        // Filter item hanya yang milik toko ini (jika 1 transaksi bisa beli dari banyak toko)
-        $itemsMilikToko = $order->detailTransaksi->filter(function ($detail) use ($tokoId) {
-            return $detail->barang->toko_id == $tokoId;
-        });
+        if (!$order) {
+            return response()->json(['message' => 'Pesanan tidak ditemukan'], 404);
+        }
 
-        // Mapping Detail
-        $mappedItems = $itemsMilikToko->map(function ($detail) {
+        // Mapping Detail Barang
+        $mappedItems = $order->details->map(function ($detail) {
             return [
                 'id' => $detail->id,
-                'product_name' => $detail->barang->nama,
+                'product_name' => $detail->nama_barang_snapshot, // Pakai snapshot nama barang
                 'quantity' => $detail->jumlah,
                 'price' => $detail->harga_satuan,
+                'image' => $detail->gambar_snapshot
             ];
         });
 
         $response = [
             'id' => $order->id,
-            'invoice_number' => $order->invoice_code ?? 'INV-' . $order->id,
+            'invoice_number' => $order->invoice_number,
             'status' => $order->status,
             'customer_name' => $order->user->nama,
             'shipping_address' => $order->alamat_pengiriman ?? 'Alamat tidak tersedia',
             'total_amount' => $order->total_harga,
             'created_at' => $order->created_at,
-            'items' => $mappedItems->values(),
+            'items' => $mappedItems,
         ];
 
         return response()->json($response, 200);
     }
 
-
+    // PUT /api/seller/orders/{id}/status (Update Status Pesanan)
     public function updateStatus(Request $request, $id) {
+        // Validasi status sesuai ENUM di database
         $request->validate([
-            'status' => 'required|string|in:Menunggu Konfirmasi,Diproses,Dikirim,Selesai,Dibatalkan'
+            'status' => 'required|string|in:pending,paid,shipped,completed,cancelled'
         ]);
 
-        $order = Transaksi::findOrFail($id);
+        $user = Auth::user();
+
+        // Cari order milik toko ini
+        $order = Transaksi::where('id', $id)
+            ->where('toko_id', $user->toko->id)
+            ->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Pesanan tidak ditemukan'], 404);
+        }
 
         // Update status
         $order->status = $request->status;

@@ -29,7 +29,7 @@ class TransaksiController extends Controller
         }
 
         // 2. Kelompokkan per Toko (Karena 1 transaksi per toko biasanya)
-        // Sederhana dulu: Anggap 1x checkout bisa banyak toko, jadi kita bikin loop transaksi
+        // Anggap 1x checkout bisa banyak toko, jadi di bikin loop transaksi
         
         $groupedByToko = $keranjangItems->groupBy(function ($item) {
             return $item->barang->toko_id;
