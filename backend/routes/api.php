@@ -2,51 +2,44 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// --- IMPORT CONTROLLER (Sesuaikan dengan lokasi file Anda) ---
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\BarangController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TokoController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KeranjangController;
-use App\Http\Controllers\MatakuliahController;
+use App\Http\Controllers\SellerOrderController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\Admin\DashboardController;
+use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
+// CSRF Cookie
+Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show'])
+    ->middleware('web');
 
-// ==========================
-// 1. PUBLIC ROUTES (Tanpa Login)
-// ==========================
+// Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/email/resend', [AuthController::class, 'resendVerification'])
+    ->middleware('auth:sanctum'); // hanya yang sudah login tapi belum verif
 
-// Tes untuk melihat daftar barang tanpa login (Opsional)
-Route::get('/barang', [BarangController::class, 'index']);
-Route::get('/barang/{id}', [BarangController::class, 'show']);
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
-
-// ==========================
-// 2. PROTECTED ROUTES (Harus Login / Punya Token)
-// ==========================
-Route::middleware('auth:sanctum')->group(function () {
-    
-    // Auth
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Profile
     Route::get('/profile', function (Request $request) {
         return $request->user();
     });
 
     // --- Module: Toko (Seller) ---
-    // Kita ubah dari apiResource menjadi manual agar URL-nya lebih jelas: '/toko/me'
-    Route::get('/toko/me', [TokoController::class, 'show']); // Cek toko milik user login
-    Route::post('/toko', [TokoController::class, 'store']);  // Buka toko baru
-    Route::put('/toko', [TokoController::class, 'update']);  // Update info toko (opsional)
+    Route::get('/toko/me', [TokoController::class, 'show']);   // Cek toko milik user login
+    Route::post('/toko', [TokoController::class, 'store']);    // Buka toko baru
+    Route::put('/toko', [TokoController::class, 'update']);    // Update info toko
 
     // --- Module: Barang (Product Management) ---
-    // Menambahkan GET /barang agar React bisa meload daftar produk
     Route::get('/barang', [BarangController::class, 'index']); // Get All My Products
     Route::post('/barang', [BarangController::class, 'store']); // Create
     Route::put('/barang/{id}', [BarangController::class, 'update']); // Update
@@ -54,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Keranjang
     Route::apiResource('keranjang', KeranjangController::class);
+
     // Kategori
     Route::get('/kategori', [KategoriController::class, 'index']);
 

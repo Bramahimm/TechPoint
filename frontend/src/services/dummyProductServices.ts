@@ -4,6 +4,7 @@ import Produk3 from "@/assets/images/product3.webp";
 import Produk4 from "@/assets/images/product4.webp";
 import Produk5 from "@/assets/images/product5.webp";
 import Produk6 from "@/assets/images/product6.webp";
+import api from "./api";
 
 export interface Product {
   id: number;
@@ -12,6 +13,7 @@ export interface Product {
   imageUrl: string;
   rating: number;
 }
+
 
 export const getFeaturedProducts = async (): Promise<Product[]> => {
   return [
