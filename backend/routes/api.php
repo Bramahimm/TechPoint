@@ -42,6 +42,8 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 // ulasan bisa di liat siapa saja
 Route::get('/barang/{id}/ulasan', [UlasanController::class, 'index']);
 
+// Untuk dropdown filter kategori di Frontend
+Route::get('/kategori', [KategoriController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/user', [AuthController::class, 'userProfile']);
@@ -68,8 +70,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     //ulasan
     Route::post('/ulasan', [UlasanController::class, 'store']);
 
-    // Kategori
-    Route::get('/kategori', [KategoriController::class, 'index']);
+    // Kategori admin
+    Route::post('/kategori', [KategoriController::class, 'store']);
+    Route::delete('/kategori/{id}', [KategoriController::class, 'destroy']);
 
     // Transaksi
     Route::post('/checkout', [TransaksiController::class, 'store']);
