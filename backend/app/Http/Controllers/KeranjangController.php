@@ -5,32 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\Keranjang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator; // <--- PERBAIKAN 1: Tambah ini
 
 class KeranjangController extends Controller
 {
     public function index()
     {
         $userId = Auth::id();
-        
+
         // Ambil keranjang user beserta data barangnya
         $items = Keranjang::with('barang')->where('user_id', $userId)->get();
 
         // Mapping data agar sesuai struktur JSON yang diminta React
         $data = $items->map(function ($item) {
+            // Cek agar tidak error jika barang sudah dihapus admin tapi masih ada di keranjang
+            if (!$item->barang) return null; 
+
             return [
-                'id' => $item->id, // ID Keranjang
+                'id' => $item->id, // ID Keranjang (UUID)
                 'product_id' => $item->barang_id,
                 'name' => $item->barang->nama,
                 'price' => $item->barang->harga,
                 'quantity' => $item->jumlah,
                 'stock' => $item->barang->stok,
+                // Handle gambar yang mungkin null atau array
                 'image' => $item->barang->gambar, 
-                'is_selected' => $item->is_selected, 
+                'is_selected' => (bool) $item->is_selected,
                 'varian' => $item->varian,
             ];
-        });
+        })->filter(); // Hapus item yang null (barang terhapus)
 
-        return response()->json($data, 200);
+        return response()->json($data->values(), 200); // Reset index array
     }
 
     public function store(Request $request)
@@ -42,11 +47,12 @@ class KeranjangController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $userId = Auth::id();
 
+        // Cek apakah barang sudah ada di keranjang (dengan varian yang sama)
         $existingItem = Keranjang::where('user_id', $userId)
             ->where('barang_id', $request->barang_id)
             ->where('varian', $request->varian)
@@ -69,7 +75,6 @@ class KeranjangController extends Controller
     }
 
     // PUT: /api/keranjang/{id}
-    // Dipanggil oleh: handleUpdateQuantity() di CartPage.tsx
     public function update(Request $request, $id)
     {
         $keranjang = Keranjang::where('user_id', Auth::id())->where('id', $id)->first();
@@ -77,16 +82,14 @@ class KeranjangController extends Controller
         if (!$keranjang) {
             return response()->json(['message' => 'Item tidak ditemukan'], 404);
         }
+        
+        // Bisa update jumlah ATAU status is_selected
+        $keranjang->update($request->only(['jumlah', 'is_selected']));
 
-        $keranjang->update([
-            'jumlah' => $request->jumlah
-        ]);
-
-        return response()->json(['message' => 'Jumlah berhasil diupdate'], 200);
+        return response()->json(['message' => 'Keranjang berhasil diupdate'], 200);
     }
 
     // DELETE: /api/keranjang/{id}
-    // Dipanggil oleh: handleRemoveItem() di CartPage.tsx
     public function destroy($id)
     {
         $keranjang = Keranjang::where('user_id', Auth::id())->where('id', $id)->first();

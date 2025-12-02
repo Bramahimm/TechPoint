@@ -4,24 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids; // <--- WAJIB
 
-class Keranjang extends Model
+class Ulasan extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids; // <--- WAJIB
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $table = 'ulasan';
 
     protected $fillable = [
         'user_id',
         'barang_id',
-        'jumlah',
+        'rating',
+        'komentar',
     ];
 
-    // Relasi: Item keranjang ini milik satu User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relasi: Item keranjang ini merujuk ke satu Barang
     public function barang()
     {
         return $this->belongsTo(Barang::class);

@@ -4,10 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids; 
 
 class Barang extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids; 
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+    
+    protected $table = 'barang'; 
 
     protected $fillable = [
         'toko_id',
@@ -16,6 +22,7 @@ class Barang extends Model
         'deskripsi',
         'harga',
         'stok',
+        'gambar', 
     ];
 
     // Relasi: Barang ini milik satu Toko

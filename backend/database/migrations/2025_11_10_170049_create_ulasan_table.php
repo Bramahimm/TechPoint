@@ -8,14 +8,15 @@ return new class extends Migration {
     public function up() {
         Schema::create('ulasan', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id');
-            $table->uuid('barang_id');
-            $table->integer('rating');
+            
+            // Gunakan foreignUuid agar seragam
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('barang_id')->constrained('barang')->onDelete('cascade');
+            
+            $table->integer('rating'); // Skala 1-5
             $table->text('komentar')->nullable();
+            
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');
         });
     }
 

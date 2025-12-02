@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids; // WAJIB
 
 class Message extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids; // WAJIB
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $table = 'message';
 
     protected $fillable = [
         'conversation_id',
@@ -15,13 +20,11 @@ class Message extends Model
         'pesan',
     ];
 
-    // Relasi: Pesan ini milik satu Percakapan
     public function conversation()
     {
         return $this->belongsTo(Conversation::class);
     }
 
-    // Relasi: Pesan ini dikirim oleh satu User
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');

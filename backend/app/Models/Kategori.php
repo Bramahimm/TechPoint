@@ -4,13 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids; // <--- WAJIB
 
 class Kategori extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids; // <--- WAJIB
 
-    // Nama tabel 'kategoris' sudah jamak, jadi tidak perlu protected $table
-    
+    // Karena ID-nya UUID, bukan angka
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $table = 'kategori'; 
+
     protected $fillable = [
         'nama',
         'deskripsi',
