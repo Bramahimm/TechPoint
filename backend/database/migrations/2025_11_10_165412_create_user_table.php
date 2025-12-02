@@ -4,26 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('nama');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('role')->default('pembeli'); // Contoh: pembeli, penjual
-            $table->timestamp('email_verified_at')->nullable(); 
-            $table->rememberToken(); 
-            $table->timestamps(); // Ini akan membuat created_at & updated_at
+            $table->string('role')->default('pengguna');
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
-    public function down(): void
-    {
+
+    public function down(): void {
         Schema::dropIfExists('users');
     }
 };

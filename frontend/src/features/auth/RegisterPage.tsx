@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Footer from "@/components/layout/Footer";
 import Input from "@/components/ui/Input";
@@ -8,11 +8,15 @@ import TechPointLogo from "@/assets/images/Logo_TechPoint.webp";
 import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ nama: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    nama: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const { register } = useAuth(); // ambil register dari AuthContext
-  const navigate = useNavigate(); // untuk redirect
+  const { register } = useAuth(); // ambil fungsi register dari AuthContext
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,11 +28,23 @@ export default function RegisterPage() {
     setMessage("");
 
     try {
-      await register(form); // panggil register dari AuthContext
-      setMessage("Registrasi berhasil! Silakan verifikasi email Anda.");
-      setTimeout(() => navigate("/login"), 1500); // redirect ke login setelah sukses
-    } catch {
-      setMessage("Registrasi gagal, coba lagi.");
+      await register({
+        nama: form.nama,
+        email: form.email,
+        password: form.password,
+        password_confirmation: form.password_confirmation,
+      });
+
+      setMessage(
+        "Registrasi berhasil! Silakan cek email Anda untuk verifikasi."
+      );
+    } catch (err: any) {
+      console.error("REGISTER ERROR:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        Object.values(err.response?.data?.errors || {}).flat()[0] ||
+        "Registrasi gagal, coba lagi.";
+      setMessage(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -36,8 +52,9 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow flex justify-center bg-orange-400 px-6 md:px-20 py-16">
+      <div className="flex-grow flex justify-center bg-orange-500 px-6 md:px-20 py-16">
         <div className="flex w-full max-w-7xl items-center justify-between gap-10">
+          {/* Bagian kiri: Logo & teks (hanya muncul di desktop) */}
           <div className="hidden md:flex flex-col items-center text-white w-1/2">
             <img
               src={TechPointLogo}
@@ -47,23 +64,37 @@ export default function RegisterPage() {
             <p className="text-2xl">Temukan Barang Elektronik Murah</p>
           </div>
 
-          {/* Form */}
+          {/* Form registrasi */}
           <form
             onSubmit={handleSubmit}
             className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
             <h2 className="text-3xl font-bold mb-6 text-center text-black">
               Register TechPoint
             </h2>
+
+            {/* Pesan sukses / error */}
             {message && (
-              <p
-                className={`text-sm mb-4 ${
-                  message.includes("berhasil")
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}>
-                {message}
-              </p>
+              <>
+                {message.includes("berhasil") ? (
+                  <div className="text-center space-y-4 p-4">
+                    <p className="text-green-600 font-semibold text-lg pb-4">
+                      {message}
+                    </p>
+                    <Link to="/login">
+                      <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 text-sm">
+                        Kembali Login
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <p className="text-red-600 bg-red-50 border border-red-200 rounded-lg p-4 text-center font-medium">
+                    {message}
+                  </p>
+                )}
+              </>
             )}
+
+            {/* Input form */}
             <Input
               name="nama"
               type="text"
@@ -85,18 +116,37 @@ export default function RegisterPage() {
               value={form.password}
               onChange={handleChange}
             />
-            <Button type="submit" className="w-full mt-6" disabled={loading}>
+            <Input
+              name="password_confirmation"
+              type="password"
+              placeholder="Ulangi Password"
+              value={form.password_confirmation}
+              onChange={handleChange}
+              required
+            />
+
+            {/* Tombol submit */}
+            <Button
+              type="submit"
+              className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 font-bold"
+              disabled={loading}>
               {loading ? "Memproses..." : "Register"}
             </Button>
+
+            {/* Link ke login */}
             <p className="text-sm text-center mt-4">
               Sudah punya akun?{" "}
-              <Link to="/login" className="text-blue-600 hover:underline">
+              <Link
+                to="/login"
+                className="text-blue-600 font-bold hover:underline">
                 Login
               </Link>
             </p>
           </form>
         </div>
       </div>
+
+      {/* Footer halaman */}
       <Footer />
     </div>
   );

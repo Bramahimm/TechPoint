@@ -75,7 +75,6 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
         />
 
         <div className="flex gap-4 flex-grow">
-          {/* Gambar Produk: Menggunakan path dari assets jika gambar lokal, atau langsung URL */}
           <img
             src={item.image}
             alt={item.name}

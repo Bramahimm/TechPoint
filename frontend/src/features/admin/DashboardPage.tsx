@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios"; // Pastikan sudah install axios
+import axios from "axios";
 
 export default function DashboardPage() {
   // State untuk menampung data dari Laravel
@@ -13,7 +13,7 @@ export default function DashboardPage() {
     // Panggil API Laravel
     const fetchStats = async () => {
       try {
-        // Sesuaikan URL dengan route api.php kamu
+        
         const response = await axios.get(
           "http://127.0.0.1:8000/api/admin/dashboard"
         );

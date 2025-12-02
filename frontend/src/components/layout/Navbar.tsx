@@ -1,3 +1,5 @@
+// src/components/layout/Navbar.tsx
+
 import { useEffect, useState, useRef } from "react";
 import {
   FaSearch,
@@ -10,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, logout } = useAuth(); 
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -44,6 +46,8 @@ export default function Navbar() {
   const handleRemove = (term: string) => {
     setHistory((prev) => prev.filter((item) => item !== term));
   };
+
+  const isLoggedIn = user !== null;
 
   return (
     <nav className="bg-sky-300 shadow-md sticky top-0 z-50">
@@ -114,48 +118,59 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* User */}
-          {isAuthenticated && user ? (
-            <div
-              className="relative"
-              onMouseEnter={() => setShowUserMenu(true)}
-              onMouseLeave={() => setShowUserMenu(false)}>
-              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition">
-                <FaUserCircle size={22} />
-                <span className="hidden md:inline text-sm font-medium">
-                  {user.name}
+          {/* User Menu */}
+          {isLoggedIn ? (
+            <div className="relative">
+              {/* CONTAINER UTAMA — hover di sini semua aman */}
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setShowUserMenu(true)}>
+                <FaUserCircle size={26} className="text-white drop-shadow" />
+                <span className="hidden md:inline text-white font-semibold drop-shadow">
+                  Hi, {user?.nama?.split(" ")[0] || "User"}
                 </span>
               </div>
 
+            
               {showUserMenu && (
-                <div className="absolute right-0 w-40 bg-white border rounded shadow-lg">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100">
-                    Profile Saya
-                  </Link>
-                  <Link
-                    to="/seller"
-                    className="block px-4 py-2 hover:bg-gray-100">
-                    Toko Saya
-                  </Link>
-                  <Link
-                    to="/orders"
-                    className="block px-4 py-2 hover:bg-gray-100">
-                    Pesanan Saya
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500">
-                    Logout
-                  </button>
+                <div
+                  className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
+                  onMouseLeave={() => setShowUserMenu(false)}>
+                  <div className="px-5 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                    <p className="font-bold text-lg">{user?.nama}</p>
+                    <p className="text-sm opacity-90">{user?.email}</p>
+                  </div>
+
+                  <div className="py-2">
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition">
+                      Profile Saya
+                    </Link>
+                    <Link
+                      to="/seller"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition">
+                      Toko Saya
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition">
+                      Pesanan Saya
+                    </Link>
+                    <hr className="my-2" />
+                    <button
+                      onClick={logout}
+                      className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-red-50 text-red-600 font-semibold transition">
+                      Logout
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
             <Link
               to="/login"
-              className="bg-blue-500 text-white psx-4 py-2 rounded-full hover:bg-blue-600 transition">
+              className="text-orange-700 font-semibold px-8 py-2 rounded-xl transition-colors duration-200 hover:text-orange-500">
               Login
             </Link>
           )}

@@ -26,8 +26,8 @@ export default function CartPage() {
   const fetchCart = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await fetchCartItems();
-      setCartItems(data.map((item) => ({ ...item, isChecked: true })));
+      const dataCart = await fetchCartItems();
+      setCartItems(dataCart.map((item) => ({ ...item, isChecked: true })));
     } catch (error) {
       handleError(error);
     } finally {
