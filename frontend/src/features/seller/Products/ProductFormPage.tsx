@@ -153,7 +153,8 @@ const ProductFormPage: React.FC = () => {
               value={formData.category}
               onChange={handleChange}
               className="w-full border border-gray-300 p-2 rounded-lg bg-white"
-              required>
+              required
+            >
               {DUMMY_CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
@@ -236,7 +237,8 @@ const ProductFormPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition disabled:bg-gray-400">
+            className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition disabled:bg-gray-400"
+          >
             {isSubmitting
               ? "Menyimpan..."
               : isEdit
