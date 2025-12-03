@@ -110,5 +110,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         // Kategori Management (Admin Only)
         Route::post('/kategori', [KategoriController::class, 'store']);
         Route::delete('/kategori/{id}', [KategoriController::class, 'destroy']);
+        Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index']);
+        Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index']);
     });
 });

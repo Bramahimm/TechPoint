@@ -6,6 +6,7 @@ import TechPointLogo from "@/assets/images/Logo_TechPoint.webp";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/context/AuthContext";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
+import api from "@/services/api"; // pastikan kamu punya ini (biasanya axios instance)
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -27,14 +28,36 @@ export default function LoginPage() {
     setShowResend(false);
 
     try {
-      await login(form);
-      navigate("/dashboard");
+      // Langsung panggil API supaya kita dapat response lengkap (p
+      const response = await api.post("/login", form);
+
+      // Simpan token
+      localStorage.setItem("token", response.data.access_token);
+
+      // Ambil role dari response
+      const role = response.data.user.role;
+
+      // Update context biar user terdeteksi login di seluruh aplikasi
+      await login(form); // tetap panggil supaya AuthContext ter-update
+
+      // REDIRECT BERDASARKAN ROLE – INI YANG KAMU TUNGGU-TUNGGU!
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (role === "penjual") {
+        navigate("/seller/orders"); // atau ganti ke route seller yang kamu mau
+      } else {
+        navigate("/dashboard"); // pembeli biasa
+      }
+
     } catch (err: any) {
-      if (err.message === "EMAIL_NOT_VERIFIED") {
+      // Tangani error verifikasi email
+      const message = err.response?.data?.message || "";
+
+      if (message.toLowerCase().includes("verifikasi") || err.message === "EMAIL_NOT_VERIFIED") {
         setError("Email belum diverifikasi. Silakan cek email Anda.");
         setShowResend(true);
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
+      } else if (message) {
+        setError(message);
       } else {
         setError("Email atau password salah");
       }
@@ -79,18 +102,19 @@ export default function LoginPage() {
             <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
               Masuk ke Akun Anda
             </h2>
+
             {/* Pesan Error / Sukses */}
             {error && (
               <div
                 className={`mb-6 p-4 rounded-xl text-center font-medium border ${
-                  error.includes("dikirim ulang") ||
-                  error.includes("Silakan cek email")
+                  error.includes("dikirim ulang") || error.includes("Silakan cek email")
                     ? "bg-green-50 text-green-700 border-green-300"
                     : "bg-red-50 text-red-700 border-red-300"
                 }`}>
                 {error}
               </div>
             )}
+
             {/* Tombol Kirim Ulang */}
             {showResend && (
               <div className="text-center mb-6">
@@ -102,6 +126,7 @@ export default function LoginPage() {
                 </button>
               </div>
             )}
+
             <Input
               type="email"
               name="email"
@@ -120,16 +145,16 @@ export default function LoginPage() {
               required
               className="mb-6"
             />
+
             <Button
               type="submit"
               disabled={loading || !form.email || !form.password}
               className="w-full py-3 text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed">
               {loading ? "Memproses..." : "Login"}
             </Button>
+
             <p className="text-right mt-4">
-              <Link
-                to="/forgot-password"
-                className="text-blue-600 hover:underline text-sm">
+              <Link to="/forgot-password" className="text-blue-600 hover:underline text-sm">
                 Lupa Password?
               </Link>
             </p>
@@ -140,9 +165,7 @@ export default function LoginPage() {
                   <div className="w-full border-t border-gray-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
-                    Atau login dengan
-                  </span>
+                  <span className="px-2 bg-white text-gray-500">Atau login dengan</span>
                 </div>
               </div>
 
@@ -151,11 +174,10 @@ export default function LoginPage() {
                 onError={() => setError("Login Google gagal. Coba lagi.")}
               />
             </div>
+
             <p className="text-center mt-8 text-gray-600 border-t pt-6">
               Belum punya akun?{" "}
-              <Link
-                to="/register"
-                className="text-orange-600 font-bold hover:underline">
+              <Link to="/register" className="text-orange-600 font-bold hover:underline">
                 Register Sekarang
               </Link>
             </p>

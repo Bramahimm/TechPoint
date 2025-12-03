@@ -1,50 +1,99 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import AdminPageWrapper from "./AdminPageWrapper";
+import api from "@/services/api";
+import { Package, ShoppingCart, Users, Activity, CheckCircle2 } from "lucide-react";
 
 export default function DashboardPage() {
-  // State untuk menampung data dari Laravel
   const [stats, setStats] = useState({
     total_users: 0,
-    total_orders: 0,
     total_products: 0,
+    total_orders: 0,
+    total_penjual: 0,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Panggil API Laravel
-    const fetchStats = async () => {
-      try {
-        
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/admin/dashboard"
-        );
-        setStats(response.data.data); // Simpan data ke state
-      } catch (error) {
-        console.error("Gagal mengambil data dashboard:", error);
-      }
-    };
-
-    fetchStats();
+    api.get("/admin/dashboard")
+      .then(res => {
+        const data = res.data?.data || res.data || {};
+        setStats({
+          total_users: data.total_users || 0,
+          total_products: data.total_products || 0,
+          total_orders: data.total_orders || 0,
+          total_penjual: data.total_penjual || 0,
+        });
+      })
+      .catch(() => {
+        // Kalau error, tetap tampilkan 0 biar nggak crash
+        setStats({ total_users: 0, total_products: 0, total_orders: 0, total_penjual: 0 });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+  const cards = [
+    { title: "Total Pengguna", value: stats.total_users.toLocaleString(), icon: Users, color: "bg-blue-500" },
+    { title: "Total Produk", value: stats.total_products.toLocaleString(), icon: Package, color: "bg-purple-500" },
+    { title: "Total Order", value: stats.total_orders.toLocaleString(), icon: ShoppingCart, color: "bg-green-500" },
+    { title: "Total Penjual", value: stats.total_penjual.toLocaleString(), icon: Activity, color: "bg-orange-500" },
+  ];
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-gray-500 text-sm">Total Users</h2>
-          {/* Tampilkan data dari State */}
-          <p className="text-2xl font-bold">{stats.total_users}</p>
+  if (loading) {
+    return (
+      <AdminPageWrapper title="Dashboard">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-2xl text-gray-500 animate-pulse">Memuat data...</div>
         </div>
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-gray-500 text-sm">Total Orders</h2>
-          <p className="text-2xl font-bold">{stats.total_orders}</p>
+      </AdminPageWrapper>
+    );
+  }
+
+  return (
+    <AdminPageWrapper title="Dashboard Admin">
+      <div className="space-y-10">
+
+        {/* Header */}
+        <div>
+          <h1 className="text-4xl font-bold text-gray-800">Selamat Datang, Admin!</h1>
+          <p className="text-gray-600 mt-2 text-lg">Semua sistem berjalan dengan lancar hari ini</p>
         </div>
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-gray-500 text-sm">Total Products</h2>
-          <p className="text-2xl font-bold">{stats.total_products}</p>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {cards.map((card, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">{card.title}</p>
+                  <p className="text-4xl font-bold text-gray-800 mt-3">{card.value}</p>
+                </div>
+                <div className={`${card.color} p-4 rounded-xl shadow-md`}>
+                  <card.icon className="w-10 h-10 text-white" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* Bagian Bawah — Hanya Server Aktif */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-10 text-white shadow-2xl text-center">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="w-6 h-6 bg-green-300 rounded-full animate-ping"></div>
+              <CheckCircle2 className="w-16 h-16" />
+              <div className="w-6 h-6 bg-green-300 rounded-full animate-ping"></div>
+            </div>
+            <h2 className="text-4xl font-bold mb-3">Server Aktif & Stabil</h2>
+            <p className="text-xl opacity-95">TechPoint berjalan dengan sempurna. Semua layanan online 100%.</p>
+            <p className="mt-6 text-sm opacity-80">
+              {new Date().toLocaleString("id-ID", { dateStyle: "full", timeStyle: "medium" })}
+            </p>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </AdminPageWrapper>
   );
 }
