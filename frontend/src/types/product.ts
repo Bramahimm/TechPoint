@@ -1,5 +1,4 @@
-// src/types/product.ts
-// Asumsi file ini sudah ada, jika belum, buat.
+
 
 export interface Product {
     id: string;
@@ -8,7 +7,7 @@ export interface Product {
     stock: number;
     description: string;
     category: string;
-    images: string[]; // URL gambar
+    images: string[]; 
     status: 'active' | 'inactive';
     created_at: string;
 }

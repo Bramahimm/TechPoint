@@ -10,17 +10,17 @@ export interface CheckoutItem extends CartItem {
   subtotal: number;
   originalSubtotal: number;
   discountAmount: number;
-  stock: number; // Tambahkan stok untuk validasi
+  stock: number; 
   isOutOfStock: boolean;
 }
 
 export interface ComputationResult {
   processedItems: CheckoutItem[];
-  subtotal: number; // Total harga barang setelah diskon
-  discountTotal: number; // Total diskon
+  subtotal: number; 
+  discountTotal: number; 
   shippingCost: number;
-  finalTotal: number; // Grand Total
-  originalSubtotal: number; // Total harga barang sebelum diskon
+  finalTotal: number; 
+  originalSubtotal: number; 
   isStockValid: boolean;
 }
 

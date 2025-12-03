@@ -2,21 +2,22 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Kategori;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        $kategori = [
+            ['nama' => 'Laptop', 'deskripsi' => 'Laptop kerja dan gaming'],
+            ['nama' => 'Smartphone', 'deskripsi' => 'HP Android dan iOS'],
+            ['nama' => 'Kamera', 'deskripsi' => 'Kamera digital dan aksesoris'],
+            ['nama' => 'Aksesoris', 'deskripsi' => 'Mouse, Keyboard, Headset'],
+        ];
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        foreach ($kategori as $k) {
+            Kategori::create($k);
+        }
     }
 }

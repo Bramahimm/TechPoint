@@ -4,19 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class DetailTransaksi extends Model
 {
-    protected $table = 'detail_transaksi'; // Pastikan nama tabel sesuai
-    protected $guarded = [];
+    use HasFactory, HasUuids;
 
-    // Relasi ke Barang
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $table = 'detail_transaksi';
+
+    protected $fillable = [
+        'transaksi_id',
+        'barang_id',
+        'jumlah',
+        'harga_satuan',
+        'nama_barang_snapshot',
+        'gambar_snapshot'
+    ];
+
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'barang_id');
     }
 
-    // Relasi ke Transaksi Utama
     public function transaksi()
     {
         return $this->belongsTo(Transaksi::class, 'transaksi_id');
