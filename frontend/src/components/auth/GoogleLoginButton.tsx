@@ -17,11 +17,9 @@ export default function GoogleLoginButton({
   onSuccess,
   onError,
 }: GoogleLoginButtonProps) {
-  // Ref buat div tombol + flag mencegah render ulang script
   const buttonDivRef = useRef<HTMLDivElement>(null);
   const hasRendered = useRef(false);
 
-  // Load script Google Sign-In sekali
   useEffect(() => {
     if (hasRendered.current) return;
     hasRendered.current = true;
