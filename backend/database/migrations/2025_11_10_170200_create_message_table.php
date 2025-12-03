@@ -7,22 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('message', function (Blueprint $table) {
-            // Primary key UUID
             $table->uuid('id')->primary();
 
-            // conversation_id → UUID (karena tabel conversation juga pakai UUID)
-            $table->uuid('conversation_id');
-            $table->foreign('conversation_id')
-                ->references('id')
-                ->on('conversation')
-                ->onDelete('cascade');
-
-            // sender_id → UUID (karena tabel users pakai UUID)
-            $table->uuid('sender_id');
-            $table->foreign('sender_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
+            // Rapikan pakai foreignUuid
+            $table->foreignUuid('conversation_id')->constrained('conversation')->onDelete('cascade');
+            $table->foreignUuid('sender_id')->constrained('users')->onDelete('cascade');
 
             $table->text('pesan');
             $table->timestamps();

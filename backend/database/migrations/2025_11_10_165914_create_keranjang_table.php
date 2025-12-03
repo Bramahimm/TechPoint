@@ -7,14 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up() {
         Schema::create('keranjang', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('user_id');
-            $table->uuid('barang_id');
-            $table->integer('jumlah');
-            $table->timestamps();
+            $table->uuid('id')->primary(); // Primary Key UUID
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');
+            // Foreign Key UUID yang rapi
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('barang_id')->constrained('barang')->onDelete('cascade');
+
+            $table->integer('jumlah');
+            
+            // Tambahan kolom yang diminta Controller
+            $table->string('varian')->nullable(); 
+            $table->boolean('is_selected')->default(true); 
+
+            $table->timestamps();
         });
     }
 

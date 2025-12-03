@@ -3,30 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-// Import Model yang dibutuhkan
 use App\Models\User;
-use App\Models\Barang;    // Asumsi nama model produk adalah Barang
-use App\Models\Transaksi; // Asumsi nama model order adalah Transaksi
+use App\Models\Barang;
+use App\Models\Transaksi;
 
 class DashboardController extends Controller
 {
-    // Menampilkan data statistik dashboard admin
     public function index()
     {
-        // 1. Ambil data statistik dari Database
-        $totalUsers = User::count();
-        $totalProducts = Barang::count();
-        $totalOrders = Transaksi::count(); // Atau logic lain, misal: Transaksi::where('status', 'paid')->count();
-
-        // 2. Return JSON agar bisa dibaca oleh React
-        return response()->json([
-            'message' => 'Data dashboard berhasil diambil',
-            'data' => [
-                'total_users' => $totalUsers,
-                'total_products' => $totalProducts,
-                'total_orders' => $totalOrders,
-            ]
-        ], 200);
+        try {
+            return response()->json([
+                'total_users' => User::count(),
+                'total_products' => Barang::count(),
+                'total_orders' => Transaksi::count(),
+                'total_penjual' => User::where('role', 'penjual')->count(),
+                'total_revenue' => Transaksi::whereIn('status', ['completed', 'complete', 'selesai', 'success'])
+                    ->sum('total_harga') ?: 0,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Dashboard error: ' . $e->getMessage());
+            return response()->json([
+                'total_users' => 0,
+                'total_products' => 0,
+                'total_orders' => 0,
+                'total_penjual' => 0,
+                'total_revenue' => 0,
+            ]);
+        }
     }
 }
