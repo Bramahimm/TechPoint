@@ -75,39 +75,54 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
-      <Route path="/profile/edit" element={<EditProfilePage />} />
+     <Route
+        path="/profile/edit"
+        element={
+        <ProtectedRoute>
+          <EditProfilePage />
+        </ProtectedRoute>
+        }
+/>
 
       {/* ADMIN ROUTES */}
       <Route
         path="/admin/dashboard"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <DashboardPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/admin/users"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <UsersPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/admin/products"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <ProductsPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/admin/orders"
         element={
+           <ProtectedRoute requireAdmin>
           <AdminLayout>
             <OrdersPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
     </Routes>
