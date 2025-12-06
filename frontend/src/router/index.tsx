@@ -10,8 +10,7 @@ import CartPage from "@/features/shop/CartPage";
 import CheckoutPage from "@/features/shop/CheckoutPage";
 import OrderPage from "@/features/user/OrderPage";
 import SellerRouter from "@/features/seller/SellerRouter";
-
-// ADMIN PAGES ← SEMUA IMPORT SUDAH DITAMBAHIN
+import EditProfilePage from "@/features/user/EditProfilePage";
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardPage from "@/features/admin/DashboardPage";
 import UsersPage from "@/features/admin/UsersPage";
@@ -76,6 +75,7 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route path="/profile/edit" element={<EditProfilePage />} />
 
       {/* ADMIN ROUTES */}
       <Route

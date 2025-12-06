@@ -95,10 +95,11 @@ class AuthController extends Controller
     }
 
     // --- PROFILE ---
-    public function userProfile(Request $request)
+   public function userProfile(Request $request)
     {
-        return response()->json($request->user()->only(['id', 'nama', 'email', 'role', 'email_verified_at']));
+        return response()->json($request->user());
     }
+
 
 
     public function verifyEmail(Request $request, string $id, $hash)
@@ -132,4 +133,28 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Link verifikasi telah dikirim ulang ke email Anda.']);
     }
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'nama'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->nama  = $request->nama;
+        $user->email = $request->email;
+
+        if ($request->email !== $user->getOriginal('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profil berhasil diperbarui!',
+            'user'    => $user
+        ]);
+    }
+
 }

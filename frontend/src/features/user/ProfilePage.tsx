@@ -1,9 +1,28 @@
+import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { useAuth } from "@/context/AuthContext";
+import api from "@/services/api";
+import type { User } from "@/types/User";
+import { useNavigate } from "react-router-dom";
+
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<User | null>(null); 
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get("/user")
+      .then(res => {
+        setUser(res.data as User);
+      })
+      .catch(() => {
+        setUser(null);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="text-center mt-10">Memuat...</p>;
 
   return (
     <>
@@ -20,16 +39,16 @@ export default function ProfilePage() {
             {/* Header Profil */}
             <div className="flex items-center gap-6 mb-6">
               <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-3xl font-bold">
-                {user.name?.[0]}
+                {user.nama?.[0]}
               </div>
 
               <div>
                 <p className="text-xl font-semibold text-gray-800">
-                  {user.name}
+                  {user.nama}
                 </p>
                 <p className="text-gray-500">{user.email}</p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Bergabung sejak: Januari 2025
+                  Bergabung sejak: {user.created_at ? new Date(user.created_at).toLocaleDateString("id-ID") : "-"}
                 </p>
               </div>
             </div>
@@ -44,7 +63,7 @@ export default function ProfilePage() {
             <div className="space-y-3">
               <div className="flex justify-between text-gray-700">
                 <span className="font-medium">Nama Lengkap</span>
-                <span>{user.name}</span>
+                <span>{user.nama}</span>
               </div>
 
               <div className="flex justify-between text-gray-700">
@@ -53,13 +72,8 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex justify-between text-gray-700">
-                <span className="font-medium">Username</span>
-                <span>user123</span>
-              </div>
-
-              <div className="flex justify-between text-gray-700">
                 <span className="font-medium">Role</span>
-                <span>Pengguna</span>
+                <span>{user.role}</span>
               </div>
             </div>
 
@@ -73,18 +87,19 @@ export default function ProfilePage() {
             <div className="space-y-3">
               <div className="flex justify-between text-gray-700">
                 <span className="font-medium">No. Telepon</span>
-                <span>+62 812 3456 7890</span>
+                <span>-</span>
               </div>
 
               <div className="flex justify-between text-gray-700">
                 <span className="font-medium">Alamat</span>
-                <span>Jl. Mawar No. 10, Jakarta</span>
+                <span>-</span>
               </div>
             </div>
 
-            {/* Tombol Edit */}
             <div className="mt-8">
-              <button className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+              <button 
+              onClick={() => navigate("/profile/edit")} 
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
                 Edit Profil
               </button>
             </div>

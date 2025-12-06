@@ -58,6 +58,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::get('/profile', function (Request $request) { return $request->user(); });
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/user/update', [AuthController::class, 'updateProfile']);
+    
+
+
 
     // --- Toko (Shop Management) ---
     Route::get('/toko/me', [TokoController::class, 'show']);
