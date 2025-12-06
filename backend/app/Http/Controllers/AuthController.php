@@ -133,10 +133,11 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Link verifikasi telah dikirim ulang ke email Anda.']);
     }
-    public function updateProfile(Request $request)
+   public function updateProfile(Request $request)
     {
         $user = $request->user();
 
+        // Validasi nama & email
         $request->validate([
             'nama'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -149,6 +150,23 @@ class AuthController extends Controller
             $user->email_verified_at = null;
         }
 
+        // Kalau user mau ganti password
+        if ($request->filled('password_baru')) {
+            $request->validate([
+                'password_lama' => 'required',
+                'password_baru' => 'required|min:8|confirmed', // confirmed = otomatis cek password_baru_confirmation (tapi kita gak kirim, jadi cukup cek manual di frontend)
+            ]);
+
+            // Cek password lama bener apa enggak
+            if (!Hash::check($request->password_lama, $user->password)) {
+                return response()->json([
+                    'message' => 'Password lama salah!'
+                ], 400);
+            }
+
+            $user->password = Hash::make($request->password_baru);
+        }
+
         $user->save();
 
         return response()->json([
@@ -156,5 +174,4 @@ class AuthController extends Controller
             'user'    => $user
         ]);
     }
-
 }

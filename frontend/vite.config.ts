@@ -18,4 +18,13 @@ export default defineConfig({
       "@router": path.resolve(__dirname, "src/router"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });
