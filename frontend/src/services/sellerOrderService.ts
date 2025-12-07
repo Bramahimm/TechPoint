@@ -1,7 +1,5 @@
 // src/services/sellerOrderService.ts
 import type { SellerOrder, OrderStatus } from "@/types/product";
-// import api from '@/services/api'; // Import instance Axios Anda
-
 const DUMMY_ORDERS: SellerOrder[] = [
   {
     id: "ORD001",

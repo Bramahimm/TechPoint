@@ -18,27 +18,24 @@ const SellerLayout: React.FC = () => (
     <div className="flex flex-grow overflow-hidden">
       <SellerSidebar />
       <main className="flex-grow p-6 overflow-y-auto">
-        <Outlet /> {/* Ini akan merender halaman anak */}
+        <Outlet /> 
       </main>
     </div>
   </div>
 );
 
-// Routing Internal Seller Centre
+
 const SellerRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<SellerLayout />}>
-        {/* Route utama /seller -> redirect ke dashboard */}
         <Route index element={<SellerDashboardPage />} />
         <Route path="dashboard" element={<SellerDashboardPage />} />
 
-        {/* Produk */}
         <Route path="products" element={<ProductListPage />} />
         <Route path="products/add" element={<ProductFormPage />} />
         <Route path="products/edit/:id" element={<ProductFormPage />} />
 
-        {/* Pesanan */}
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:id" element={<OrderDetailPage />} />
       </Route>
