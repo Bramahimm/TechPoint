@@ -67,7 +67,8 @@ export default function RegisterPage() {
           {/* Form registrasi */}
           <form
             onSubmit={handleSubmit}
-            className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+            className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md"
+          >
             <h2 className="text-3xl font-bold mb-6 text-center text-black">
               Register TechPoint
             </h2>
@@ -129,7 +130,8 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 font-bold"
-              disabled={loading}>
+              disabled={loading}
+            >
               {loading ? "Memproses..." : "Register"}
             </Button>
 
@@ -138,7 +140,8 @@ export default function RegisterPage() {
               Sudah punya akun?{" "}
               <Link
                 to="/login"
-                className="text-blue-600 font-bold hover:underline">
+                className="text-blue-600 font-bold hover:underline"
+              >
                 Login
               </Link>
             </p>

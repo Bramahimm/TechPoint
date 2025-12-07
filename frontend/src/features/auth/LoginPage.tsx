@@ -98,7 +98,8 @@ export default function LoginPage() {
           {/* Form Login */}
           <form
             onSubmit={handleSubmit}
-            className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md">
+            className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md"
+          >
             <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
               Masuk ke Akun Anda
             </h2>
@@ -110,7 +111,8 @@ export default function LoginPage() {
                   error.includes("Silakan cek email")
                     ? "bg-green-50 text-green-700 border-green-300"
                     : "bg-red-50 text-red-700 border-red-300"
-                }`}>
+                }`}
+              >
                 {error}
               </div>
             )}
@@ -120,7 +122,8 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={handleResend}
-                  className="text-orange-600 font-semibold underline hover:text-orange-700">
+                  className="text-orange-600 font-semibold underline hover:text-orange-700"
+                >
                   Kirim Ulang Email Verifikasi
                 </button>
               </div>
@@ -148,14 +151,16 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading || !form.email || !form.password}
-              className="w-full py-3 text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 disabled:opacity-70">
+              className="w-full py-3 text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 disabled:opacity-70"
+            >
               {loading ? "Memproses..." : "Login"}
             </Button>
 
             <p className="text-right mt-4">
               <Link
                 to="/forgot-password"
-                className="text-blue-600 hover:underline text-sm">
+                className="text-blue-600 hover:underline text-sm"
+              >
                 Lupa Password?
               </Link>
             </p>
@@ -182,7 +187,8 @@ export default function LoginPage() {
               Belum punya akun?{" "}
               <Link
                 to="/register"
-                className="text-orange-600 font-bold hover:underline">
+                className="text-orange-600 font-bold hover:underline"
+              >
                 Register Sekarang
               </Link>
             </p>
