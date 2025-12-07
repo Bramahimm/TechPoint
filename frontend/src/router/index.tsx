@@ -10,8 +10,6 @@ import CartPage from "@/features/shop/CartPage";
 import CheckoutPage from "@/features/shop/CheckoutPage";
 import OrderPage from "@/features/user/OrderPage";
 import SellerRouter from "@/features/seller/SellerRouter";
-
-// ADMIN PAGES ← SEMUA IMPORT SUDAH DITAMBAHIN
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardPage from "@/features/admin/DashboardPage";
 import UsersPage from "@/features/admin/UsersPage";
@@ -81,33 +79,41 @@ export default function AppRouter() {
       <Route
         path="/admin/dashboard"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <DashboardPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/admin/users"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <UsersPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/admin/products"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <ProductsPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/admin/orders"
         element={
+          <ProtectedRoute requireAdmin>
           <AdminLayout>
             <OrdersPage />
           </AdminLayout>
+          </ProtectedRoute>
         }
       />
     </Routes>
