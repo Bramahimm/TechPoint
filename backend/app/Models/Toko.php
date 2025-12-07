@@ -19,8 +19,8 @@ class Toko extends Model
         'nama_toko',
         'alamat',
         'no_telp',
-        'deskripsi', // Tambahan sesuai migrasi
-        'logo',      // Tambahan sesuai migrasi
+        'deskripsi', 
+        'logo',      
     ];
 
     public function user()
@@ -28,9 +28,9 @@ class Toko extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function barang()
+    public function products()
     {
-        return $this->hasMany(Barang::class);
+        return $this->hasMany(Product::class);
     }
 
     public function conversation()

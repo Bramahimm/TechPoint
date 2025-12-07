@@ -6,7 +6,6 @@ import TechPointLogo from "@/assets/images/Logo_TechPoint.webp";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/context/AuthContext";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
-import api from "@/services/api"; // pastikan kamu punya ini (biasanya axios instance)
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -14,7 +13,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showResend, setShowResend] = useState(false);
 
-  const { login, resendVerification } = useAuth();
+  // SEMUA HOOKS DI ATAS!
+  const { login, user, checkAuth, resendVerification } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,38 +28,26 @@ export default function LoginPage() {
     setShowResend(false);
 
     try {
-      // Langsung panggil API supaya kita dapat response lengkap (p
-      const response = await api.post("/login", form);
+      await login(form);
+      if (!user) await checkAuth();
 
-      // Simpan token
-      localStorage.setItem("token", response.data.access_token);
-
-      // Ambil role dari response
-      const role = response.data.user.role;
-
-      // Update context biar user terdeteksi login di seluruh aplikasi
-      await login(form); // tetap panggil supaya AuthContext ter-update
-
-      // REDIRECT BERDASARKAN ROLE – INI YANG KAMU TUNGGU-TUNGGU!
-      if (role === "admin") {
+      if (user?.role === "admin") {
         navigate("/admin/dashboard");
-      } else if (role === "penjual") {
-        navigate("/seller/orders"); // atau ganti ke route seller yang kamu mau
+      } else if (user?.role === "penjual") {
+        navigate("/seller/orders");
       } else {
-        navigate("/dashboard"); // pembeli biasa
+        navigate("/dashboard");
       }
-
     } catch (err: any) {
-      // Tangani error verifikasi email
-      const message = err.response?.data?.message || "";
-
-      if (message.toLowerCase().includes("verifikasi") || err.message === "EMAIL_NOT_VERIFIED") {
+      const msg = err.message || err.response?.data?.message || "";
+      if (
+        msg.includes("VERIFIED") ||
+        msg.toLowerCase().includes("verifikasi")
+      ) {
         setError("Email belum diverifikasi. Silakan cek email Anda.");
         setShowResend(true);
-      } else if (message) {
-        setError(message);
       } else {
-        setError("Email atau password salah");
+        setError(msg || "Email atau password salah");
       }
     } finally {
       setLoading(false);
@@ -68,11 +56,23 @@ export default function LoginPage() {
 
   const handleResend = async () => {
     try {
-      await resendVerification();
+      await resendVerification(); // LANGSUNG PAKAI, SUDAH DI-ATAS
       setError("Link verifikasi telah dikirim ulang ke email Anda!");
       setShowResend(false);
     } catch {
       setError("Gagal mengirim ulang. Coba lagi nanti.");
+    }
+  };
+
+  // Handler untuk Google Login
+  const handleGoogleSuccess = async () => {
+    await checkAuth(); // penting! refresh user state
+    if (user?.role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (user?.role === "penjual") {
+      navigate("/seller/orders");
+    } else {
+      navigate("/dashboard");
     }
   };
 
@@ -103,11 +103,11 @@ export default function LoginPage() {
               Masuk ke Akun Anda
             </h2>
 
-            {/* Pesan Error / Sukses */}
             {error && (
               <div
                 className={`mb-6 p-4 rounded-xl text-center font-medium border ${
-                  error.includes("dikirim ulang") || error.includes("Silakan cek email")
+                  error.includes("dikirim ulang") ||
+                  error.includes("Silakan cek email")
                     ? "bg-green-50 text-green-700 border-green-300"
                     : "bg-red-50 text-red-700 border-red-300"
                 }`}>
@@ -115,13 +115,12 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Tombol Kirim Ulang */}
             {showResend && (
               <div className="text-center mb-6">
                 <button
                   type="button"
                   onClick={handleResend}
-                  className="text-orange-600 font-semibold underline hover:text-orange-700 transition">
+                  className="text-orange-600 font-semibold underline hover:text-orange-700">
                   Kirim Ulang Email Verifikasi
                 </button>
               </div>
@@ -149,12 +148,14 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading || !form.email || !form.password}
-              className="w-full py-3 text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed">
+              className="w-full py-3 text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg transition transform hover:scale-105 disabled:opacity-70">
               {loading ? "Memproses..." : "Login"}
             </Button>
 
             <p className="text-right mt-4">
-              <Link to="/forgot-password" className="text-blue-600 hover:underline text-sm">
+              <Link
+                to="/forgot-password"
+                className="text-blue-600 hover:underline text-sm">
                 Lupa Password?
               </Link>
             </p>
@@ -165,19 +166,23 @@ export default function LoginPage() {
                   <div className="w-full border-t border-gray-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Atau login dengan</span>
+                  <span className="px-2 bg-white text-gray-500">Atau</span>
                 </div>
               </div>
 
               <GoogleLoginButton
-                onSuccess={() => console.log("Google login success")}
-                onError={() => setError("Login Google gagal. Coba lagi.")}
+                onSuccess={handleGoogleSuccess}
+                onError={() =>
+                  setError("Login dengan Google gagal. Coba lagi.")
+                }
               />
             </div>
 
             <p className="text-center mt-8 text-gray-600 border-t pt-6">
               Belum punya akun?{" "}
-              <Link to="/register" className="text-orange-600 font-bold hover:underline">
+              <Link
+                to="/register"
+                className="text-orange-600 font-bold hover:underline">
                 Register Sekarang
               </Link>
             </p>

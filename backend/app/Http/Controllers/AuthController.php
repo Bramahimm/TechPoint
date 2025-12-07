@@ -10,11 +10,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 
-class AuthController extends Controller
-{
-    // --- REGISTER ---
-    public function register(Request $request)
-    {
+class AuthController extends Controller {
+    public function register(Request $request) {
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -25,26 +22,19 @@ class AuthController extends Controller
             'nama' => $request->nama,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'pembeli', // Default
+            'role' => 'pembeli',
         ]);
 
-        // Kirim email verifikasi (tetap jalan di background/log)
         event(new Registered($user));
-
-        // ✨ TAMBAHAN: Buat Token agar langsung login setelah daftar (API Style)
-        $token = $user->createToken('auth_token')->plainTextToken;
+        Auth::login($user);
 
         return response()->json([
-            'message' => 'Register berhasil. Silakan cek email untuk verifikasi.',
-            'data' => $user,
-            'access_token' => $token, // <--- Penting buat Frontend
-            'token_type' => 'Bearer'
+            'message' => 'Register berhasil',
+            'user' => $user->only(['id', 'nama', 'email', 'role']),
         ], 201);
     }
 
-    // --- LOGIN ---
-    public function login(Request $request)
-    {
+    public function login(Request $request) {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -56,80 +46,48 @@ class AuthController extends Controller
             ]);
         }
 
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
-
-        // verivikasi email
-        
         if (!$user->hasVerifiedEmail()) {
-            // Hapus token yang mungkin terbuat (logout paksa)
-            $user->tokens()->delete(); 
-            return response()->json([
-                'message' => 'Email belum diverifikasi. Silakan cek email atau klik Resend Verification.'
-            ], 403);
+            Auth::logout();
+            return response()->json(['message' => 'Email belum diverifikasi.'], 403);
         }
-    
-
-        // ✨ BAGIAN TOKEN (Pengganti Session untuk API)
-        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login berhasil',
-            'user' => $user->only(['id', 'nama', 'email', 'role']),
-            'access_token' => $token, // <--- Kunci masuk
-            'token_type' => 'Bearer'
+            'user' => $user->only(['id', 'nama', 'email', 'role', 'email_verified_at']),
         ]);
     }
 
-    // --- LOGOUT ---
-    public function logout(Request $request)
-    {
-        // Hapus token saat ini (API Style)
-        if ($request->user()) {
-            $request->user()->currentAccessToken()->delete();
-        }
-
+    public function logout(Request $request) {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logout berhasil']);
     }
 
-    // --- PROFILE ---
-    public function userProfile(Request $request)
-    {
-        return response()->json($request->user()->only(['id', 'nama', 'email', 'role', 'email_verified_at']));
-    }
+    public function verifyEmail(Request $request, string $id, $hash) {
+        $user = User::findOrFail($id);
 
-
-    public function verifyEmail(Request $request, string $id, $hash)
-    {
-        $user = User::where('id', $id)->firstOrFail();
-
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {
             return response()->json(['message' => 'Link tidak valid'], 400);
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            // Redirect ke frontend kalau sudah verifikasi
-            return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/login?verified=true');
         }
 
         if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 
-        // Redirect ke frontend setelah sukses
         return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/login?verified=true');
     }
 
-    public function resendVerification(Request $request)
-    {
+    public function resendVerification(Request $request) {
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email sudah diverifikasi']);
         }
 
         $request->user()->sendEmailVerificationNotification();
 
-        return response()->json(['message' => 'Link verifikasi telah dikirim ulang ke email Anda.']);
+        return response()->json(['message' => 'Link verifikasi dikirim ulang']);
     }
 }

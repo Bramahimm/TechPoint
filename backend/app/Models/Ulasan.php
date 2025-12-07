@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // <--- WAJIB
+use Illuminate\Database\Eloquent\Concerns\HasUuids; 
 
 class Ulasan extends Model
 {
-    use HasFactory, HasUuids; // <--- WAJIB
+    use HasFactory, HasUuids; 
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -26,8 +26,8 @@ class Ulasan extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function barang()
+    public function products()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Product::class);
     }
 }

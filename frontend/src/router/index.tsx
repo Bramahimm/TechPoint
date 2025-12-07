@@ -8,8 +8,12 @@ import ProtectedRoute from "./ProtectedRoute";
 import ProfilePage from "@/features/user/ProfilePage";
 import CartPage from "@/features/shop/CartPage";
 import CheckoutPage from "@/features/shop/CheckoutPage";
+
 import OrderPage from "@/features/user/OrderPage";
 import SellerRouter from "@/features/seller/SellerRouter";
+import TokoCreationPage from "@/features/seller/Toko/TokoCreationPage";
+import SellerLayoutWrapper from "@/features/seller/SellerLayoutWrapper";
+
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardPage from "@/features/admin/DashboardPage";
 import UsersPage from "@/features/admin/UsersPage";
@@ -70,10 +74,12 @@ export default function AppRouter() {
         path="/seller/*"
         element={
           <ProtectedRoute>
-            <SellerRouter />
+            <SellerLayoutWrapper /> 
           </ProtectedRoute>
-        }
-      />
+        }>
+        <Route path="toko/create" element={<TokoCreationPage />} />
+        <Route path="*" element={<SellerRouter />} />
+      </Route>
 
       {/* ADMIN ROUTES */}
       <Route

@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // <--- WAJIB
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Keranjang extends Model
 {
-    use HasFactory, HasUuids; // <--- WAJIB
+    use HasFactory, HasUuids; 
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -19,8 +19,8 @@ class Keranjang extends Model
         'user_id',
         'barang_id',
         'jumlah',
-        'varian',      // Tambahan
-        'is_selected'  // Tambahan
+        'varian',      
+        'is_selected'  
     ];
 
     public function user()
@@ -28,8 +28,8 @@ class Keranjang extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function barang()
+    public function products()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Product::class);
     }
 }

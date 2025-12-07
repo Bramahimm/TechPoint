@@ -1,3 +1,4 @@
+// app/Http/Controllers/BarangController.php (Controller CRUD)
 <?php
 
 namespace App\Http\Controllers;
@@ -5,112 +6,91 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator; 
-use Illuminate\Support\Facades\Storage;  
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
-class BarangController extends Controller
-{
-    // GET: /api/barang (Milik Toko Saya)
-    public function index()
-    {
-        $user = Auth::user();
-
-        // Cek apakah user punya toko
-        if (!$user->toko) {
-            return response()->json([], 200);
-        }
-
-        // Ambil barang beserta data kategorinya (Eager Loading) agar nama kategori muncul
-        $barangs = Barang::with('kategori')->where('toko_id', $user->toko->id)->get();
-
-        // Format data untuk Frontend (ProductCard.tsx)
-        $data = $barangs->map(function ($barang) {
-            return [
-                'id' => $barang->id,
-                'name' => $barang->nama,
-                'price' => $barang->harga,
-                'stock' => $barang->stok,
-                // Ambil nama kategori dari relasi, jika null tulis 'Uncategorized'
-                'category' => $barang->kategori ? $barang->kategori->nama : 'Uncategorized',
-                'status' => $barang->stok > 0 ? 'active' : 'inactive',
-                'description' => $barang->deskripsi,
-                // Pastikan gambar berupa URL lengkap
-                'images' => $barang->gambar ? [$barang->gambar] : []
-            ];
-        });
-
-        return response()->json($data, 200);
+class BarangController extends Controller {
+    public function index() {
+        $products = Barang::with(['kategori', 'toko'])->paginate(20);
+        return response()->json($products);
     }
 
-    // POST: /api/barang (Tambah Barang Baru)
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
+    public function show($id) {
+        $product = Barang::with(['kategori', 'toko'])->findOrFail($id);
+        $product->imageUrl = $product->gambar ? asset('storage/' . $product->gambar) : null;
+        return response()->json($product);
+    }
+
+    public function store(Request $request) {
+        $user = Auth::user();
+        if (!$user->toko) {
+            return response()->json(['message' => 'Anda belum memiliki toko'], 403);
+        }
+
+        $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'stok' => 'required|integer',
-            'deskripsi' => 'nullable|string', 
-            'kategori_id' => 'required|exists:kategori,id', 
+            'deskripsi' => 'nullable|string',
+            'harga' => 'required|numeric|min:1000',
+            'stok' => 'required|integer|min:0',
+            'kategori_id' => 'nullable|uuid|exists:kategori,id',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        $validated['toko_id'] = $user->toko->id;
 
-        // Upload Gambar
-        $pathGambar = null;
         if ($request->hasFile('gambar')) {
-            // Simpan di storage/app/public/products
-            $path = $request->file('gambar')->store('products', 'public');
-            // Generate URL lengkap
-            $pathGambar = url('storage/' . $path);
+            $path = $request->file('gambar')->store('public/produk');
+            $validated['gambar'] = $path;
         }
 
-        // Simpan ke Database
-        $barang = Barang::create([
-            'toko_id' => Auth::user()->toko->id,
-            'kategori_id' => $request->kategori_id, // <--- Sesuaikan dengan Model
-            'nama' => $request->nama,
-            'deskripsi' => $request->deskripsi,
-            'harga' => $request->harga,
-            'stok' => $request->stok,
-            'gambar' => $pathGambar,
-        ]);
+        $product = Barang::create($validated);
+        $product->imageUrl = $product->gambar ? asset('storage/' . $product->gambar) : null;
 
-        return response()->json([
-            'message' => 'Produk berhasil ditambahkan', 
-            'data' => $barang
-        ], 201);
+        return response()->json($product, 201);
     }
 
-    // DELETE: /api/barang/{id}
-    public function destroy($id)
-    {
+    public function update(Request $request, $id) {
+        $product = Barang::findOrFail($id);
         $user = Auth::user();
-        
-        // Pastikan toko ada & barang milik toko tersebut
-        if (!$user->toko) {
-            return response()->json(['message' => 'Toko tidak ditemukan'], 404);
+        if ($product->toko_id !== $user->toko->id) {
+            return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
-        $barang = Barang::where('id', $id)
-                        ->where('toko_id', $user->toko->id)
-                        ->first();
+        $validated = $request->validate([
+            'nama' => 'sometimes|required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'harga' => 'sometimes|required|numeric|min:1000',
+            'stok' => 'sometimes|required|integer|min:0',
+            'kategori_id' => 'nullable|uuid|exists:kategori,id',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
-        if (!$barang) {
-            return response()->json(['message' => 'Produk tidak ditemukan'], 404);
+        if ($request->hasFile('gambar')) {
+            if ($product->gambar) {
+                Storage::delete($product->gambar);
+            }
+            $path = $request->file('gambar')->store('public/produk');
+            $validated['gambar'] = $path;
         }
 
-        // Hapus file gambar dari storage jika ada (Opsional tapi bersih)
-        if ($barang->gambar) {
-            // Kita perlu ambil path relatif dari URL (misal: products/foto.jpg)
-            $relativePath = str_replace(url('storage/'), '', $barang->gambar);
-            Storage::disk('public')->delete($relativePath);
+        $product->update($validated);
+        $product->imageUrl = $product->gambar ? asset('storage/' . $product->gambar) : null;
+
+        return response()->json($product);
+    }
+
+    public function destroy($id) {
+        $product = Barang::findOrFail($id);
+        $user = Auth::user();
+        if ($product->toko_id !== $user->toko->id) {
+            return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
-        $barang->delete();
+        if ($product->gambar) {
+            Storage::delete($product->gambar);
+        }
 
-        return response()->json(['message' => 'Produk berhasil dihapus'], 200);
+        $product->delete();
+        return response()->json(['message' => 'Produk dihapus']);
     }
 }
