@@ -1,5 +1,3 @@
-// src/components/layout/Navbar.tsx
-
 import { useEffect, useState, useRef } from "react";
 import {
   FaSearch,
@@ -7,30 +5,17 @@ import {
   FaUserCircle,
   FaTimes,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import Logo from "@/assets/images/Logo_TechPoint.webp";
 import { useAuth } from "@/context/AuthContext";
-<<<<<<< HEAD
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth(); // ambil dari AuthContext
-=======
-import { Link } from "react-router-dom";
-
-export default function Navbar() {
-<<<<<<< HEAD
-  const { user, isAuthenticated, logout } = useAuth();
->>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
-=======
-  const { user, logout } = useAuth(); 
->>>>>>> 1c1f00469ff9d80460dcda467a83a5167f203fc4
+  const { user, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [cartCount] = useState(2);
-<<<<<<< HEAD
-=======
   const [showUserMenu, setShowUserMenu] = useState(false);
->>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
+  const [cartCount] = useState(2);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -38,10 +23,6 @@ export default function Navbar() {
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
-<<<<<<< HEAD
-  // Simpan riwayat ke localStorage setiap kali berubah
-=======
->>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
   useEffect(() => {
     localStorage.setItem("searchHistory", JSON.stringify(history));
   }, [history]);
@@ -49,10 +30,7 @@ export default function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
-<<<<<<< HEAD
 
-=======
->>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
     if (!history.includes(search.trim())) {
       setHistory((prev) => [search.trim(), ...prev].slice(0, 5));
     }
@@ -93,7 +71,8 @@ export default function Navbar() {
             />
             <button
               type="submit"
-              className="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-1 rounded-full hover:bg-blue-600 transition">
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-1 rounded-full hover:bg-blue-600 transition"
+            >
               Cari
             </button>
           </form>
@@ -104,7 +83,8 @@ export default function Navbar() {
                 <span className="text-gray-500 text-sm">Riwayat Pencarian</span>
                 <button
                   onClick={() => setHistory([])}
-                  className="text-xs text-blue-500 hover:underline">
+                  className="text-xs text-blue-500 hover:underline"
+                >
                   Hapus Semua
                 </button>
               </div>
@@ -112,7 +92,8 @@ export default function Navbar() {
                 {history.map((item, idx) => (
                   <li
                     key={idx}
-                    className="flex justify-between items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    className="flex justify-between items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
                     <span onClick={() => handleSelect(item)}>{item}</span>
                     <FaTimes
                       onClick={() => handleRemove(item)}
@@ -130,7 +111,8 @@ export default function Navbar() {
           {/* Cart */}
           <Link
             to="/cart"
-            className="relative cursor-pointer hover:scale-110 transition">
+            className="relative cursor-pointer hover:scale-110 transition"
+          >
             <FaShoppingCart size={22} />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -139,55 +121,25 @@ export default function Navbar() {
             )}
           </Link>
 
-<<<<<<< HEAD
-          {/* User */}
-          {isAuthenticated && user ? (
-            <div
-<<<<<<< HEAD
-              className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition"
-              onClick={logout}>
-              <FaUserCircle size={22} />
-              <span className="hidden md:inline text-sm font-medium">
-                {user.name}
-              </span>
-              <span className="text-l font-semibold text-red-500 ml-2">
-                Logout
-              </span>
-            </div>
-          ) : (
-            <a
-              href="/login"
-              className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">
-              Login
-            </a>
-=======
-              className="relative"
-              onMouseEnter={() => setShowUserMenu(true)}
-              onMouseLeave={() => setShowUserMenu(false)}>
-              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition">
-                <FaUserCircle size={22} />
-                <span className="hidden md:inline text-sm font-medium">
-                  {user.name}
-=======
           {/* User Menu */}
           {isLoggedIn ? (
             <div className="relative">
-              {/* CONTAINER UTAMA — hover di sini semua aman */}
               <div
                 className="flex items-center gap-2 cursor-pointer"
-                onClick={() => setShowUserMenu(true)}>
+                onMouseEnter={() => setShowUserMenu(true)}
+                onMouseLeave={() => setShowUserMenu(false)}
+              >
                 <FaUserCircle size={26} className="text-white drop-shadow" />
                 <span className="hidden md:inline text-white font-semibold drop-shadow">
                   Hi, {user?.nama?.split(" ")[0] || "User"}
->>>>>>> 1c1f00469ff9d80460dcda467a83a5167f203fc4
                 </span>
               </div>
 
-            
               {showUserMenu && (
                 <div
                   className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
-                  onMouseLeave={() => setShowUserMenu(false)}>
+                  onMouseLeave={() => setShowUserMenu(false)}
+                >
                   <div className="px-5 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white">
                     <p className="font-bold text-lg">{user?.nama}</p>
                     <p className="text-sm opacity-90">{user?.email}</p>
@@ -196,23 +148,27 @@ export default function Navbar() {
                   <div className="py-2">
                     <Link
                       to="/profile"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition">
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition"
+                    >
                       Profile Saya
                     </Link>
                     <Link
                       to="/seller"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition">
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition"
+                    >
                       Toko Saya
                     </Link>
                     <Link
                       to="/orders"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition">
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-orange-50 transition"
+                    >
                       Pesanan Saya
                     </Link>
                     <hr className="my-2" />
                     <button
                       onClick={logout}
-                      className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-red-50 text-red-600 font-semibold transition">
+                      className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-red-50 text-red-600 font-semibold transition"
+                    >
                       Logout
                     </button>
                   </div>
@@ -222,10 +178,10 @@ export default function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="text-orange-700 font-semibold px-8 py-2 rounded-xl transition-colors duration-200 hover:text-orange-500">
+              className="text-orange-700 font-semibold px-8 py-2 rounded-xl transition-colors duration-200 hover:text-orange-500"
+            >
               Login
             </Link>
->>>>>>> 5dc8b33b091c077f704065108f00a0447ca336c3
           )}
         </div>
       </div>
