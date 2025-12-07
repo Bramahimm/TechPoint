@@ -16,7 +16,7 @@ const ProductListPage: React.FC = () => {
     setIsLoading(true);
     try {
       const data = await getSellerProducts();
-      setProducts(data); 
+      setProducts(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -67,7 +67,8 @@ const ProductListPage: React.FC = () => {
         </h2>
         <Link
           to="/seller/products/add"
-          className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+          className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+        >
           <Plus className="w-5 h-5" />
           <span>Tambah Produk Baru</span>
         </Link>
