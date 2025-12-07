@@ -5,8 +5,8 @@ import { EWALLET_OPTIONS } from "@/utils/constants";
 import { QrCode } from "lucide-react";
 
 interface EWalletOptionsProps {
-  selectedEWallet: EWalletOption;
-  setSelectedEWallet: (wallet: EWalletOption) => void;
+  selectedEWallet: EWalletOption | null;
+  setSelectedEWallet: (wallet: EWalletOption |null) => void;
 }
 
 const PaymentEWalletOptions: React.FC<EWalletOptionsProps> = ({

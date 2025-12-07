@@ -1,15 +1,11 @@
 // src/features/shop/CartPage.tsx
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 // Import useNavigate dari react-router-dom
 import { useNavigate } from "react-router-dom";
-// Import Layout yang benar
 import MainLayout from "@/components/layout/MainLayout";
-// Import types
 import type { CartItemState } from "@/types/cart";
-// Import Services
 import { fetchCartItems, removeCartItem } from "@/services/cartService";
-// Import Utils
 import { formatCurrency } from "@/utils/formatCurrency";
 import handleError from "@/utils/handleError";
 
@@ -30,8 +26,8 @@ export default function CartPage() {
   const fetchCart = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await fetchCartItems();
-      setCartItems(data.map((item) => ({ ...item, isChecked: true })));
+      const dataCart = await fetchCartItems();
+      setCartItems(dataCart.map((item) => ({ ...item, isChecked: true })));
     } catch (error) {
       handleError(error);
     } finally {

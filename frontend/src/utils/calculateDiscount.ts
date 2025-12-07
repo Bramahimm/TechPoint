@@ -1,7 +1,6 @@
 // src/utils/calculateDiscount.ts
 import type { CartItem } from "@/types/cart";
 
-// Tambahkan definisi diskon nominal ke CartItem untuk fleksibilitas
 interface DiscountableItem extends CartItem {
   discount_nominal?: number; // Diskon dalam Rupiah
 }
@@ -25,16 +24,13 @@ export const calculateDiscount = (item: DiscountableItem) => {
     discountAmount = priceBeforeDiscount * (item.discount_percent / 100);
   }
 
-  // 3. Jika price API sudah final (item.price != original_price)
-  // Ini mengasumsikan item.price adalah harga NETT setelah diskon,
-  // jika API tidak mengirimkan discount_nominal/percent.
+
   if (item.price !== priceBeforeDiscount && discountAmount === 0) {
     discountAmount = priceBeforeDiscount - item.price;
   }
 
   finalPrice = priceBeforeDiscount - discountAmount;
 
-  // Pastikan harga final tidak negatif
   finalPrice = Math.max(0, finalPrice);
 
   return {
