@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\TokoController;
 use App\Http\Controllers\Public\ProductController as PublicProductController;
@@ -17,19 +16,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
-<<<<<<< HEAD
-// Public Routes (Bisa diakses tanpa login)
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-// Protected Routes (Harus login/punya token)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-});
-=======
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 
 Route::post('/auth/google/token', [GoogleAuthController::class, 'handleToken']);
@@ -96,4 +82,3 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index']);
     });
 });
->>>>>>> 1c1f00469ff9d80460dcda467a83a5167f203fc4
