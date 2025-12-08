@@ -9,6 +9,8 @@ interface User {
     role: string;
     email_verified_at?: string | null;
     toko?: { id: string; nama_toko: string;} | null; 
+    created_at: string;
+    updated_at: string;
 }
 
 interface AuthContextType {

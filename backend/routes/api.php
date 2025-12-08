@@ -63,6 +63,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/chat/{id}', [ChatController::class, 'show']);
     Route::post('/chat/{id}/reply', [ChatController::class, 'reply']);
 
+    Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update']);
+    Route::post('/profile/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword']);
+
     // SELLER
     Route::prefix('seller')->name('seller.')->middleware('isSeller')->group(function () {
         Route::apiResource('products', SellerProductController::class)->except(['create', 'edit']);

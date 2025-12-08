@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Barang;
+use App\Models\Product;
 use App\Models\Transaksi;
 
 class DashboardController extends Controller
@@ -14,7 +14,7 @@ class DashboardController extends Controller
         try {
             return response()->json([
                 'total_users' => User::count(),
-                'total_products' => Barang::count(),
+                'total_products' => Product::count(),
                 'total_orders' => Transaksi::count(),
                 'total_penjual' => User::where('role', 'penjual')->count(),
                 'total_revenue' => Transaksi::whereIn('status', ['completed', 'complete', 'selesai', 'success'])

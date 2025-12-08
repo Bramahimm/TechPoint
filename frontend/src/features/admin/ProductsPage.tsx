@@ -2,8 +2,18 @@ import { useEffect, useState } from "react";
 import AdminPageWrapper from "./AdminPageWrapper";
 import api from "@/services/api";
 
+interface Product {
+  id: string;
+  nama: string;
+  harga: number;
+  stok: number;
+  toko: {
+    nama_toko: string;
+  } | null;
+}
+
 export default function ProductsPage() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -11,11 +21,11 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       try {
         const res = await api.get("/admin/products");
-        // Pastikan ambil data yang benar (bisa data.data atau data langsung)
-        setProducts(res.data?.data || res.data || []);
+        const items = res.data?.data?.data || res.data?.data || res.data || [];
+        setProducts(items);
       } catch (err: any) {
         console.error("Error loading products:", err);
-        setError("Gagal memuat produk");
+        setError("Gagal memuat produk: " + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }
@@ -26,7 +36,7 @@ export default function ProductsPage() {
   if (loading) {
     return (
       <AdminPageWrapper title="Products">
-        <div className="text-center py-10 text-gray-600">Loading produk...</div>
+        <div className="text-center py-16 text-gray-600">Loading produk...</div>
       </AdminPageWrapper>
     );
   }
@@ -34,7 +44,7 @@ export default function ProductsPage() {
   if (error) {
     return (
       <AdminPageWrapper title="Products">
-        <div className="text-center py-10 text-red-600 font-medium">{error}</div>
+        <div className="text-center py-16 text-red-600 font-medium">{error}</div>
       </AdminPageWrapper>
     );
   }
@@ -42,49 +52,59 @@ export default function ProductsPage() {
   if (products.length === 0) {
     return (
       <AdminPageWrapper title="Products">
-        <div className="text-center py-10 text-gray-500">Belum ada produk</div>
+        <div className="text-center py-16 text-gray-500 text-lg">
+          Belum ada produk
+        </div>
       </AdminPageWrapper>
     );
   }
 
   return (
     <AdminPageWrapper title="Manage Products">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-max">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Produk</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Harga</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Toko</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Nama Produk
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Harga
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Stok
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Toko
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {products.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 text-sm text-gray-700">#{p.id.slice(-6)}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    #{p.id.slice(-6)}
+                  </td>
                   <td className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate">
-                    {p.nama || p.nama_barang || "Tanpa Nama"}
+                    {p.nama}
                   </td>
                   <td className="px-6 py-4 text-gray-700">
-                    Rp {(p.harga || 0).toLocaleString("id-ID")}
+                    Rp {Number(p.harga).toLocaleString("id-ID")}
                   </td>
-                  <td className="px-6 py-4 text-gray-700">{p.stok || 0}</td>
+                  <td className="px-6 py-4 text-gray-700">{p.stok}</td>
                   <td className="px-6 py-4 text-gray-700">
-                    {p.toko?.nama_toko || p.user?.nama || "Unknown"}
+                    {p.toko?.nama_toko || "Tanpa Toko"}
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                        p.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {p.status || "unknown"}
+                    <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Active
                     </span>
                   </td>
                 </tr>
