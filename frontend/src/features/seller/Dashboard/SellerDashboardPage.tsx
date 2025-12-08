@@ -1,88 +1,84 @@
 // src/features/seller/Dashboard/SellerDashboardPage.tsx
+
 import React, { useState, useEffect } from "react";
 import StoreStatsCard from "./StoreStatsCard";
 import { Package, Clock, Truck, TrendingUp } from "lucide-react";
-import { getProducts } from "@/services/productService";
-import { getSellerOrders } from "@/services/sellerOrderService";
-import type { Product, SellerOrder } from "@/types/product";
+import { getSellerDashboardStats } from "@/services/sellerDashboardService";
+
+interface DashboardStats {
+  total_products: number;
+  total_orders?: number;
+  // tambahin field lain kalau mau
+}
 
 const SellerDashboardPage: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [orders, setOrders] = useState<SellerOrder[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    total_products: 0,
+    total_orders: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadData = async () => {
-      // TODO: Hubungkan dengan axios
-      const loadedProducts = await getProducts();
-      const loadedOrders = await getSellerOrders();
-      setProducts(loadedProducts);
-      setOrders(loadedOrders);
-      setIsLoading(false);
+    const fetchData = async () => {
+      try {
+        const data = await getSellerDashboardStats();
+        console.log("Data sukses diterima:", data);
+
+        setStats({
+          total_products: data.total_products ?? 0,
+          total_orders: data.total_orders ?? 0,
+        });
+      } catch (err: any) {
+        console.error("Error:", err);
+        setError("Gagal memuat data dashboard");
+      } finally {
+        setIsLoading(false);
+      }
     };
-    loadData();
+
+    fetchData();
   }, []);
 
-  const countOrders = (status: string) =>
-    orders.filter((o) => o.status === status).length;
-
-  const stats = [
-    {
-      title: "Total Produk",
-      value: products.length,
-      icon: Package,
-      bgColor: "bg-indigo-500",
-    },
-    {
-      title: "Pesanan Baru",
-      value: countOrders("Menunggu Konfirmasi"),
-      icon: TrendingUp,
-      bgColor: "bg-orange-500",
-    },
-    {
-      title: "Menunggu Diproses",
-      value: countOrders("Diproses"),
-      icon: Clock,
-      bgColor: "bg-yellow-500",
-    },
-    {
-      title: "Sedang Dikirim",
-      value: countOrders("Dikirim"),
-      icon: Truck,
-      bgColor: "bg-green-500",
-    },
-  ];
-
-  if (isLoading) {
-    return (
-      <div className="text-center py-10 text-gray-500">Memuat Dashboard...</div>
-    );
-  }
+  if (isLoading)
+    return <div className="p-10 text-center">Memuat dashboard...</div>;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <h2 className="text-3xl font-bold text-gray-900">Dashboard Toko</h2>
 
-      {/* Kartu Ringkasan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <StoreStatsCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            bgColor={stat.bgColor}
-          />
-        ))}
+        <StoreStatsCard
+          title="Total Produk"
+          value={stats.total_products ?? 0} // tambah ?? 0
+          icon={Package}
+          bgColor="bg-indigo-500"
+        />
+        <StoreStatsCard
+          title="Total Pesanan"
+          value={stats.total_orders ?? 0}
+          icon={TrendingUp}
+          bgColor="bg-orange-500"
+        />
+        <StoreStatsCard
+          title="Menunggu Diproses"
+          value={0} // langsung kasih angka
+          icon={Clock}
+          bgColor="bg-yellow-500"
+        />
+        <StoreStatsCard
+          title="Sedang Dikirim"
+          value={0}
+          icon={Truck}
+          bgColor="bg-green-500"
+        />
       </div>
 
-      {/* Aktivitas Terkini (Dummy) */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">
-          Aktivitas Toko Terkini
-        </h3>
-        <p className="text-gray-500">Tidak ada notifikasi penting saat ini.</p>
-      </div>
+      {error && (
+        <div className="p-4 bg-red-100 rounded-lg text-red-700 text-center">
+          {error}
+        </div>
+      )}
     </div>
   );
 };
