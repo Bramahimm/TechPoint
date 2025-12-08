@@ -20,4 +20,21 @@ class ProductController extends Controller
         'data' => $products
     ]);
 }
+public function destroy($id)
+{
+    try {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Produk berhasil dihapus'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menghapus produk: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

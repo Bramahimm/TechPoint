@@ -7,7 +7,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({
     total_users: 0,
     total_products: 0,
-    total_orders: 0,
     total_penjual: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -19,13 +18,12 @@ export default function DashboardPage() {
         setStats({
           total_users: data.total_users || 0,
           total_products: data.total_products || 0,
-          total_orders: data.total_orders || 0,
           total_penjual: data.total_penjual || 0,
         });
       })
       .catch(() => {
         // Kalau error, tetap tampilkan 0 biar nggak crash
-        setStats({ total_users: 0, total_products: 0, total_orders: 0, total_penjual: 0 });
+        setStats({ total_users: 0, total_products: 0, total_penjual: 0 });
       })
       .finally(() => setLoading(false));
   }, []);
@@ -33,7 +31,6 @@ export default function DashboardPage() {
   const cards = [
     { title: "Total Pengguna", value: stats.total_users.toLocaleString(), icon: Users, color: "bg-blue-500" },
     { title: "Total Produk", value: stats.total_products.toLocaleString(), icon: Package, color: "bg-purple-500" },
-    { title: "Total Order", value: stats.total_orders.toLocaleString(), icon: ShoppingCart, color: "bg-green-500" },
     { title: "Total Penjual", value: stats.total_penjual.toLocaleString(), icon: Activity, color: "bg-orange-500" },
   ];
 
