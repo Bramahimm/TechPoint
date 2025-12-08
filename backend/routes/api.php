@@ -17,7 +17,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
-// 💡 IMPOR BARU UNTUK MIDTRANS & CHECKOUT
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\MidtransNotificationController;
 
@@ -110,6 +109,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::post('/kategori', [KategoriController::class, 'store']);
         Route::delete('/kategori/{id}', [KategoriController::class, 'destroy']);
         Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index']);
-        Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index']);
+        // Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index']);
     });
 });
