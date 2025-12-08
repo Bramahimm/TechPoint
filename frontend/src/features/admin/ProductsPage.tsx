@@ -17,6 +17,27 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Fungsi hapus produk
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm("Yakin ingin menghapus produk ini? Tindakan ini tidak bisa dibatalkan.");
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/admin/products/${id}`);
+
+      // Hapus dari state agar UI langsung update
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+
+      alert("Produk berhasil dihapus!");
+    } catch (err: any) {
+      console.error("Error deleting product:", err);
+      alert(
+        "Gagal menghapus produk: " +
+          (err.response?.data?.message || err.message || "Terjadi kesalahan")
+      );
+    }
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -84,6 +105,9 @@ export default function ProductsPage() {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -106,6 +130,14 @@ export default function ProductsPage() {
                     <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       Active
                     </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="text-red-600 hover:text-red-900 font-medium text-sm transition-colors duration-200 hover:underline"
+                    >
+                      Hapus
+                    </button>
                   </td>
                 </tr>
               ))}

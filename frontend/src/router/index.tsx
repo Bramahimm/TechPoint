@@ -28,7 +28,6 @@ import SellerRouter from "@/features/seller/SellerRouter";
 import DashboardPage from "@/features/admin/DashboardPage";
 import UsersPage from "@/features/admin/UsersPage";
 import ProductsPage from "@/features/admin/ProductsPage";
-import OrdersPage from "@/features/admin/OrdersPage";
 
 export default function AppRouter() {
   return (
@@ -103,7 +102,6 @@ export default function AppRouter() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="products" element={<ProductsPage />} />
-        <Route path="orders" element={<OrdersPage />} />
         <Route path="*" element={<DashboardPage />} />
       </Route>
 

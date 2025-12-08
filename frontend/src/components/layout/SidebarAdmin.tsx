@@ -9,7 +9,6 @@ const SidebarAdmin = () => {
     { label: "Dashboard", path: "/admin/dashboard" },
     { label: "Users",      path: "/admin/users" },
     { label: "Products",   path: "/admin/products" },
-    { label: "Orders",     path: "/admin/orders" },
   ];
 
   const handleLogout = () => {
