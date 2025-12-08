@@ -68,6 +68,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update']);
     Route::post('/profile/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword']);
+    Route::get('/seller/dashboard/stats', [DashboardController::class, 'index']);
 
     // SELLER
     Route::prefix('seller')->name('seller.')->middleware('isSeller')->group(function () {
