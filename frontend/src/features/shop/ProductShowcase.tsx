@@ -75,7 +75,7 @@ export default function ProductShowcase() {
                 className="h-40 w-full object-cover"
               />
               <div className="p-4">
-                <h3 className="font-semibold text-gray-800">{product.nama}</h3>
+                <h3 className="text-gray-800">{product.nama}</h3>
                 <p className="text-blue-600 font-bold mt-1">
                   {formatCurrency(product.harga)}
                 </p>

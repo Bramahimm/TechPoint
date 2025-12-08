@@ -39,10 +39,10 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 // PUBLIC ROUTES
 Route::get('/products', [PublicProductController::class, 'index']);
 Route::get('/products/{id}', [PublicProductController::class, 'show']);
+Route::get('/products/slug/{slug}', [PublicProductController::class, 'showBySlug']);
 Route::get('/products/{id}/ulasan', [UlasanController::class, 'index']);
 Route::get('/kategori', [KategoriController::class, 'index']);
 
-// SEMUA YANG BUTUH LOGIN + EMAIL TERVERIFIKASI
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -51,7 +51,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/toko', [TokoController::class, 'store']);
     Route::put('/toko', [TokoController::class, 'update']);
 
-    Route::apiResource('keranjang', KeranjangController::class);
+    Route::get('/cart', [KeranjangController::class, 'index']);
+    Route::post('/cart', [KeranjangController::class, 'store']); 
+    Route::put('/cart/{id}', [KeranjangController::class, 'update']); 
+    Route::delete('/cart/{id}', [KeranjangController::class, 'destroy']); 
 
     Route::post('/checkout', [TransaksiController::class, 'store']);
     Route::get('/transaksi', [TransaksiController::class, 'index']);

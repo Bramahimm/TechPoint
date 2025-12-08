@@ -19,8 +19,8 @@ interface ProductListResponse {
 }
 
 export const getSellerProducts = async (): Promise<Product[]> => {
-    const response = await api.get<ProductListResponse>("/seller/products");
-    return response.data.data;
+  const response = await api.get<ProductListResponse>("/seller/products");
+  return response.data.data;
 };
 
 interface ProductResponse {
@@ -47,6 +47,11 @@ export const getProducts = async (): Promise<Product[]> => {
     throw error;
   }
 };
+
+export async function getProductBySlug(slug: string): Promise<Product> {
+  const response = await api.get(`/products/slug/${slug}`);
+  return response.data;
+}
 
 export async function getProductById(id: string): Promise<Product> {
   const response = await api.get(`/products/${id}`);

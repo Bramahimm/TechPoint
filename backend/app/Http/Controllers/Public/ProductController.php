@@ -16,6 +16,20 @@ class ProductController extends Controller {
 
         return response()->json($products);
     }
+    // app/Http/Controllers/ProductController.php (Public/Shop)
+
+    // ...
+
+    public function showBySlug(string $slug) {
+        $product = Product::where('slug', $slug)
+            ->with(['kategori', 'toko']) 
+            ->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Produk tidak ditemukan'], 404);
+        }
+        return response()->json($product->toArray());
+    }
 
     public function show($id) {
         $product = Product::with(['toko', 'kategori'])->findOrFail($id);

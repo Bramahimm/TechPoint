@@ -1,15 +1,15 @@
-// src/components/cart/CartItemCard.tsx
 import React from "react";
 import type { CartItemState } from "@/types/cart";
 import { Trash2, ChevronDown } from "lucide-react";
-import { formatCurrency } from "@/utils/formatCurrency"; 
-import { updateCartItemQuantity, removeCartItem } from "@/services/cartService"; // Import dari service
+import { formatCurrency } from "@/utils/formatCurrency";
+import { updateCartItemQuantity, removeCartItem } from "@/services/cartService";
+import { toast } from "react-hot-toast";
 
 interface CartItemCardProps {
   item: CartItemState;
-  onCheckboxChange: (id: number, isChecked: boolean) => void;
-  onUpdateQuantity: (id: number, newQty: number) => void;
-  onRemoveItem: (id: number) => void;
+  onCheckboxChange: (id: string, isChecked: boolean) => void;
+  onUpdateQuantity: (id: string, newQty: number) => void;
+  onRemoveItem: (id: string) => void;
   isProcessing: boolean;
 }
 
@@ -24,38 +24,48 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
     const safeQty = Math.max(1, newQty);
     if (safeQty === item.quantity || isProcessing) return;
 
-    // Memanggil API melalui CartService
+    const loadingToast = toast.loading("Mengubah kuantitas...");
+
     try {
       await updateCartItemQuantity(item.id, safeQty);
-      // Update state lokal setelah sukses
       onUpdateQuantity(item.id, safeQty);
-    } catch (error) {
+      toast.success("Kuantitas berhasil diperbarui.", { id: loadingToast });
+    } catch (error: any) {
       console.error("Gagal mengubah kuantitas:", error);
-      // Menggunakan util untuk menangani error bisa diterapkan di sini
+      toast.error(
+        error.response?.data?.message || "Gagal mengubah kuantitas.",
+        { id: loadingToast }
+      );
     }
   };
 
   const handleRemove = async () => {
     if (
-      !window.confirm(`Yakin ingin menghapus ${item.name} dari keranjang?`) ||
+      !window.confirm(`Yakin ingin menghapus ${item.nama} dari keranjang?`) ||
       isProcessing
     )
       return;
 
-    // Memanggil API melalui CartService
+    const loadingToast = toast.loading("Menghapus item...");
+
     try {
       await removeCartItem(item.id);
-      // Update state lokal setelah sukses
       onRemoveItem(item.id);
-    } catch (error) {
+      toast.success("Item berhasil dihapus.", { id: loadingToast });
+    } catch (error: any) {
       console.error("Gagal menghapus item:", error);
+      toast.error(error.response?.data?.message || "Gagal menghapus item.", {
+        id: loadingToast,
+      });
     }
   };
 
   const discountAmount = item.original_price
-    ? item.original_price - item.price
+    ? item.original_price - item.harga
     : 0;
+
   const hasDiscount = discountAmount > 0;
+
   const displayDiscountPercent =
     item.discount_percent ||
     (hasDiscount
@@ -64,7 +74,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
 
   return (
     <div className="flex flex-col md:flex-row p-4 border border-gray-200 rounded-lg shadow-sm bg-white gap-4">
-      {/* Kolom Kiri: Checkbox, Gambar, Detail Produk */}
+      {/* Kolom Kiri */}
       <div className="flex items-start flex-grow">
         <input
           type="checkbox"
@@ -76,25 +86,22 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
 
         <div className="flex gap-4 flex-grow">
           <img
-            src={item.image}
-            alt={item.name}
+            src={item.gambar_url}
+            alt={item.nama}
             className="w-16 h-16 object-cover rounded flex-shrink-0"
           />
 
           <div className="flex flex-col min-w-0">
-            {/* Nama Produk */}
             <h3 className="text-base font-semibold line-clamp-2">
-              {item.name}
+              {item.nama}
             </h3>
 
-            {/* Varian */}
             {item.variant && (
               <p className="text-sm text-gray-500 mt-1">
                 Varian: {item.variant}
               </p>
             )}
 
-            {/* Produk Serupa Dropdown (Dummy) */}
             <div className="flex items-center text-sm text-blue-600 mt-2 cursor-pointer hover:underline">
               Produk Serupa <ChevronDown className="w-4 h-4 ml-1" />
             </div>
@@ -102,18 +109,19 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
         </div>
       </div>
 
-      {/* Kolom Kanan: Harga, Kuantitas, Aksi */}
+      {/* Kolom Kanan */}
       <div className="flex items-center justify-between md:justify-end md:gap-8 w-full md:w-auto mt-2 md:mt-0">
-        {/* Harga */}
         <div className="flex flex-col items-end text-right min-w-[100px]">
           {hasDiscount && (
             <p className="text-xs text-gray-500 line-through">
               {formatCurrency(item.original_price!)}
             </p>
           )}
+
           <p className="text-base font-bold text-orange-600">
-            {formatCurrency(item.price)}
+            {formatCurrency(item.harga)}
           </p>
+
           {hasDiscount && (
             <span className="text-xs text-red-500 bg-red-100 px-1 rounded">
               {displayDiscountPercent}%
@@ -121,7 +129,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
           )}
         </div>
 
-        {/* Quantity Controls */}
+        {/* Quantity Control */}
         <div className="flex items-center border border-gray-300 rounded-lg ml-4">
           <button
             onClick={() => handleQuantityChange(item.quantity - 1)}
@@ -129,9 +137,11 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
             className="p-1 w-8 h-8 flex items-center justify-center text-lg text-gray-700 disabled:opacity-50">
             -
           </button>
+
           <span className="p-1 w-8 h-8 flex items-center justify-center border-l border-r border-gray-300">
             {item.quantity}
           </span>
+
           <button
             onClick={() => handleQuantityChange(item.quantity + 1)}
             disabled={isProcessing}
@@ -140,7 +150,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
           </button>
         </div>
 
-        {/* Tombol Hapus */}
+        {/* Hapus */}
         <button
           onClick={handleRemove}
           className="text-gray-400 hover:text-red-500 transition ml-4"

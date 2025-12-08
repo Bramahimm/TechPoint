@@ -16,7 +16,7 @@ export default function Navbar() {
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [cartCount] = useState(2);
+  const [cartCount] = useState();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
