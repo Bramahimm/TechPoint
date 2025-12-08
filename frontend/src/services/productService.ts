@@ -19,8 +19,8 @@ interface ProductListResponse {
 }
 
 export const getSellerProducts = async (): Promise<Product[]> => {
-    const response = await api.get<ProductListResponse>("/seller/products");
-    return response.data.data;
+  const response = await api.get<ProductListResponse>("/seller/products");
+  return response.data.data;
 };
 
 interface ProductResponse {
@@ -39,7 +39,9 @@ interface Category {
 // FUNGSI PUBLIC (Tidak perlu autentikasi)
 
 // DIUBAH: Sekarang support parameter kategori (opsional)
-export const getProducts = async (params: Record<string, any> = {}): Promise<ProductResponse> => {
+export const getProducts = async (
+  params: Record<string, any> = {}
+): Promise<ProductResponse> => {
   try {
     const response = await api.get<ProductResponse>("/products", { params });
     return response.data; // ← langsung return object pagination (data, current_page, dll)
@@ -50,11 +52,17 @@ export const getProducts = async (params: Record<string, any> = {}): Promise<Pro
 };
 
 // TAMBAHAN BARU: Fungsi khusus untuk homepage (biar lebih jelas)
-export const getHomepageProducts = async (kategori?: string): Promise<Product[]> => {
+export const getHomepageProducts = async (
+  kategori?: string
+): Promise<Product[]> => {
   const params = kategori && kategori !== "semua" ? { kategori } : {};
   const response = await getProducts(params);
   return response.data; // ← hanya ambil array produknya
 };
+export async function getProductBySlug(slug: string): Promise<Product> {
+  const response = await api.get(`/products/slug/${slug}`);
+  return response.data;
+}
 
 export async function getProductById(id: string): Promise<Product> {
   const response = await api.get(`/products/${id}`);

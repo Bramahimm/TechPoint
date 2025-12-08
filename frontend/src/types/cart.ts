@@ -1,17 +1,15 @@
-// Representasi item keranjang yang dikirim dari API Laravel
 export interface CartItem {
-  id: number;
-  product_id: number;
-  name: string;
-  price: number;
+  id: string; 
+  product_id: string; 
+  nama: string; 
+  harga: number; 
   original_price?: number;
   quantity: number;
-  image: string;
+  gambar_url: string; 
   variant?: string;
   discount_percent?: number;
 }
 
-// Versi item keranjang untuk state React
 export interface CartItemState extends CartItem {
   isChecked: boolean;
 }

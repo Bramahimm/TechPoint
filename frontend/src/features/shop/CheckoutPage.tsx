@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 // --- Hooks & Utils ---
-import MainLayout from "@/components/layout/MainLayout";
 import { useCheckoutData } from "@/hooks/checkout/useCheckoutData";
 import { useCheckoutComputation } from "@/hooks/checkout/useCheckoutComputation";
 import { usePaymentSelection } from "@/hooks/checkout/usePaymentSelection";
@@ -31,7 +30,6 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 1. Data Source (Menerima data dari navigate.state atau localStorage)
   const {
     items: initialCartItems,
     isLoading: isDataLoading,
@@ -163,16 +161,13 @@ export default function CheckoutPage() {
   // --- Render Loading/Redirecting ---
   if (isDataLoading || isRedirecting) {
     return (
-      <MainLayout>
         <CheckoutSkeleton />
-      </MainLayout>
     );
   }
 
   const safeItems = initialCartItems ?? [];
   if (safeItems.length === 0) {
     return (
-      <MainLayout>
         <div className="text-center py-20 min-h-[50vh]">
           <h1 className="text-2xl font-bold mb-3">
             Tidak ada Item untuk Checkout
@@ -183,13 +178,11 @@ export default function CheckoutPage() {
             Kembali ke Keranjang
           </button>
         </div>
-      </MainLayout>
     );
   }
 
   // --- Render Utama ---
   return (
-    <MainLayout>
       <div className="max-w-4xl mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
         <CheckoutHeader />
 
@@ -235,6 +228,5 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
-    </MainLayout>
   );
 }
