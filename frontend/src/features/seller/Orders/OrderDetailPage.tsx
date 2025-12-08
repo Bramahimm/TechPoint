@@ -1,20 +1,14 @@
 // src/features/seller/Orders/OrderDetailPage.tsx
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getOrderDetail,
   updateOrderStatus,
 } from "@/services/sellerOrderService";
-import type { SellerOrder, OrderStatus } from "@/types/product";
+import type { SellerOrder } from "@/types/product";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { ChevronLeft, CheckCircle, Truck, RefreshCw } from "lucide-react";
-
-const ORDER_STATUSES: OrderStatus[] = [
-  "Menunggu Konfirmasi",
-  "Diproses",
-  "Dikirim",
-  "Selesai",
-];
+import { ChevronLeft, CheckCircle, Truck } from "lucide-react";
 
 const OrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,175 +17,205 @@ const OrderDetailPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const loadOrder = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Hubungkan dengan axios: const data = await sellerOrderService.getOrderDetail(id!);
-      const data = await getOrderDetail(id!);
-      setOrder(data || null);
-    } catch (error) {
-      console.error("Gagal memuat detail pesanan:", error);
-      setOrder(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadOrder = async () => {
+      if (!id) return;
+      setIsLoading(true);
+      try {
+        const data = await getOrderDetail(id);
+        setOrder(data);
+      } catch (error: any) {
+        alert("Pesanan tidak ditemukan");
+        navigate("/seller/orders");
+      } finally {
+        setIsLoading(false);
+      }
+    };
     loadOrder();
-  }, [id]);
+  }, [id, navigate]);
 
-  const handleStatusUpdate = async (newStatus: OrderStatus) => {
+  const handleStatusUpdate = async (newStatus: string) => {
     if (!order || isUpdating) return;
-    if (
-      !window.confirm(
-        `Ubah status pesanan ${order.invoice_number} menjadi "${newStatus}"?`
-      )
-    )
+    if (!window.confirm(`Ubah status menjadi ${getDisplayStatus(newStatus)}?`))
       return;
 
     setIsUpdating(true);
     try {
-      // TODO: Hubungkan dengan axios: const updated = await sellerOrderService.updateOrderStatus(id!, newStatus);
-      const updated = await updateOrderStatus(id!, newStatus);
-      setOrder(updated);
-      alert(`Status pesanan berhasil diubah menjadi ${newStatus}`);
-    } catch (error) {
-      console.error("Gagal memperbarui status:", error);
-      alert("Gagal memperbarui status pesanan.");
+      await updateOrderStatus(id!, newStatus);
+      setOrder((prev) => (prev ? { ...prev, status: newStatus } : null));
+      alert("Status berhasil diubah!");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Gagal mengubah status");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
-      case "Menunggu Konfirmasi":
-        return "bg-yellow-500";
-      case "Diproses":
-        return "bg-blue-500";
-      case "Dikirim":
-        return "bg-indigo-500";
-      case "Selesai":
-        return "bg-green-500";
-      default:
-        return "bg-gray-500";
-    }
+  const getDisplayStatus = (status: string): string => {
+    const map: Record<string, string> = {
+      pending: "Menunggu Konfirmasi",
+      paid: "Diproses",
+      shipped: "Dikirim",
+      completed: "Selesai",
+    };
+    return map[status] || status;
+  };
+
+  const getStatusColor = (status: string): string => {
+    const colors: Record<string, string> = {
+      pending: "bg-yellow-600",
+      paid: "bg-blue-600",
+      shipped: "bg-indigo-600",
+      completed: "bg-green-600",
+    };
+    return colors[status] || "bg-gray-500";
+  };
+
+  const getNextStatus = (current: string): string | null => {
+    if (current === "pending") return "paid";
+    if (current === "paid") return "shipped";
+    if (current === "shipped") return "completed";
+    return null;
   };
 
   if (isLoading) {
     return (
-      <div className="text-center py-10 text-gray-500">
-        Memuat Detail Pesanan...
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-600 mx-auto"></div>
+          <p className="mt-6 text-lg text-gray-600">Memuat pesanan...</p>
+        </div>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="text-center py-10 text-red-500">
-        Pesanan tidak ditemukan.
+      <div className="text-center py-32 text-2xl text-red-600 font-bold">
+        Pesanan tidak ditemukan
       </div>
     );
   }
 
-  const currentStatusIndex = ORDER_STATUSES.indexOf(order.status);
-  const nextStatus = ORDER_STATUSES[currentStatusIndex + 1];
+  const nextStatus = getNextStatus(order.status);
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto p-6">
       <button
         onClick={() => navigate("/seller/orders")}
-        className="flex items-center text-orange-600 hover:underline mb-4">
-        <ChevronLeft className="w-5 h-5 mr-1" /> Kembali ke Daftar Pesanan
+        className="flex items-center gap-2 text-orange-600 hover:underline mb-8 text-lg font-medium"
+      >
+        <ChevronLeft className="w-5 h-5" />
+        Kembali ke Daftar Pesanan
       </button>
 
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-        <h2 className="text-2xl font-bold mb-4">
-          Invoice: {order.invoice_number}
-        </h2>
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-10 py-8 border-b">
+          <h1 className="text-4xl font-extrabold text-gray-800">
+            Invoice: {order.invoice_number}
+          </h1>
+        </div>
 
-        {/* Status dan Aksi */}
-        <div className="flex justify-between items-center border-b pb-4 mb-4">
-          <div className="flex items-center space-x-3">
-            <span
-              className={`h-3 w-3 rounded-full ${getStatusColor(
-                order.status
-              )}`}></span>
-            <p className="text-lg font-semibold text-gray-700">
-              Status Saat Ini:{" "}
-              <span
-                className={`${getStatusColor(
+        <div className="p-10">
+          <div className="flex justify-between items-center mb-12 pb-8 border-b">
+            <div className="flex items-center gap-6">
+              <div
+                className={`w-7 h-7 rounded-full ${getStatusColor(
                   order.status
-                )} text-white px-3 py-1 rounded-full text-sm`}>
-                {order.status}
-              </span>
-            </p>
-          </div>
-
-          {nextStatus && (
-            <button
-              onClick={() => handleStatusUpdate(nextStatus)}
-              disabled={isUpdating || order.status === "Selesai"}
-              className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400">
-              {nextStatus === "Dikirim" ? (
-                <Truck className="w-5 h-5" />
-              ) : (
-                <CheckCircle className="w-5 h-5" />
-              )}
-              <span>
-                {isUpdating ? "Memperbarui..." : `Ubah ke ${nextStatus}`}
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Detail Pesanan */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Kolom Pelanggan */}
-          <div>
-            <h3 className="text-md font-bold text-gray-800 mb-2">Pelanggan</h3>
-            <p className="text-sm text-gray-600">Nama: {order.customer_name}</p>
-            <p className="text-sm text-gray-600">
-              Tanggal: {new Date(order.created_at).toLocaleDateString()}
-            </p>
-          </div>
-
-          {/* Kolom Alamat */}
-          <div className="md:col-span-1">
-            <h3 className="text-md font-bold text-gray-800 mb-2">
-              Alamat Pengiriman
-            </h3>
-            <p className="text-sm text-gray-600">{order.shipping_address}</p>
-          </div>
-
-          {/* Kolom Finansial */}
-          <div>
-            <h3 className="text-md font-bold text-gray-800 mb-2">
-              Total Pembayaran
-            </h3>
-            <p className="text-xl font-extrabold text-orange-600">
-              {formatCurrency(order.total_amount)}
-            </p>
-          </div>
-        </div>
-
-        {/* Detail Item */}
-        <div className="mt-6 pt-6 border-t">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Item Pesanan</h3>
-          {order.items.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center py-2 border-b last:border-b-0">
-              <span className="text-gray-700">{item.product_name}</span>
-              <span className="text-sm text-gray-500">
-                {item.quantity} x {formatCurrency(item.price)}
-              </span>
-              <span className="font-semibold">
-                {formatCurrency(item.quantity * item.price)}
-              </span>
+                )}`}
+              />
+              <div>
+                <p className="text-xl text-gray-600 font-medium">
+                  Status Saat Ini
+                </p>
+                <span
+                  className={`inline-block mt-3 px-8 py-4 rounded-2xl text-white font-bold text-xl ${getStatusColor(
+                    order.status
+                  )}`}
+                >
+                  {getDisplayStatus(order.status)}
+                </span>
+              </div>
             </div>
-          ))}
+
+            {nextStatus && (
+              <button
+                onClick={() => handleStatusUpdate(nextStatus)}
+                disabled={isUpdating}
+                className="flex items-center gap-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-12 py-6 rounded-2xl font-bold text-xl transition transform hover:scale-105 shadow-xl"
+              >
+                {nextStatus === "shipped" ? (
+                  <Truck className="w-8 h-8" />
+                ) : (
+                  <CheckCircle className="w-8 h-8" />
+                )}
+                <span>
+                  {isUpdating
+                    ? "Memperbarui..."
+                    : `Ubah ke ${getDisplayStatus(nextStatus)}`}
+                </span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div>
+              <p className="text-gray-600 font-semibold text-lg mb-3">
+                Pelanggan
+              </p>
+              <p className="text-3xl font-bold">{order.customer_name}</p>
+              <p className="text-gray-500 mt-2">
+                {new Date(order.created_at).toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-gray-600 font-semibold text-lg mb-3">
+                Alamat Pengiriman
+              </p>
+              <p className="text-xl text-gray-800">
+                {order.shipping_address || "-"}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-gray-600 font-semibold text-lg mb-3">
+                Total Pembayaran
+              </p>
+              <p className="text-4xl font-extrabold text-orange-600">
+                {formatCurrency(order.total_amount)}
+              </p>
+            </div>
+          </div>
+
+          <div className="border-t-2 border-gray-200 pt-12">
+            <h3 className="text-2xl font-bold mb-10">Item Pesanan</h3>
+            <div className="space-y-8">
+              {order.items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex justify-between items-center py-8 border-b border-gray-100 last:border-0"
+                >
+                  <div>
+                    <h4 className="text-2xl font-semibold text-gray-800">
+                      {item.product_name}
+                    </h4>
+                    <p className="text-lg text-gray-600 mt-2">
+                      {item.quantity} × {formatCurrency(item.price)}
+                    </p>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-800">
+                    {formatCurrency(item.price * item.quantity)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -2,15 +2,15 @@
 export interface Product {
   id: string;
   nama: string;
-  slug: string; 
+  slug: string;
   deskripsi: string;
   harga: number;
   stok: number;
   toko_id: string;
   kategori_id?: string;
-  toko: Toko; 
-  kategori?: Kategori; 
-  gambar?: string; 
+  toko: Toko;
+  kategori?: Kategori;
+  gambar?: string;
   gambar_url: string;
   created_at: string;
   updated_at?: string;
@@ -18,16 +18,15 @@ export interface Product {
 
 export interface Toko {
   id: string;
-  nama_toko: string; 
+  nama_toko: string;
   alamat?: string;
   created_at: string;
 }
 
-export interface Kategori{
+export interface Kategori {
   id: string;
   nama: string;
 }
-
 
 export interface ProductFormData {
   nama: string;
@@ -36,7 +35,7 @@ export interface ProductFormData {
   deskripsi: string;
   kategori_id: string;
   gambar?: File;
-  _method?: 'PUT' | 'PATCH';
+  _method?: "PUT" | "PATCH";
 }
 
 export type ProductPayload = Omit<Product, "id" | "created_at" | "status">;
@@ -60,8 +59,13 @@ export interface SellerOrder {
   invoice_number: string;
   customer_name: string;
   total_amount: number;
-  status: OrderStatus;
-  items: OrderItem[];
+  status: string; // UBAH DARI OrderStatus JADI string
   shipping_address: string;
   created_at: string;
+  items: {
+    id: string;
+    product_name: string;
+    quantity: number;
+    price: number;
+  }[];
 }

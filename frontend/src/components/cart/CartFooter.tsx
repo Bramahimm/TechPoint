@@ -51,7 +51,8 @@ const CartFooter: React.FC<CartFooterProps> = ({
                 ? "bg-orange-500 hover:bg-orange-600"
                 : "bg-gray-400 cursor-not-allowed"
             }`}
-          disabled={!isReadyToCheckout || isProcessing}>
+          disabled={!isReadyToCheckout || isProcessing}
+        >
           Checkout ({selectedCount})
         </button>
       </div>
