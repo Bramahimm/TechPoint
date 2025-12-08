@@ -1,111 +1,56 @@
 // src/hooks/checkout/useCheckoutComputation.ts
+
 import { useMemo } from "react";
-import type { CartItem } from "@/types/cart";
-import { calculateDiscount } from "@/utils/calculateDiscount";
-import { BANDAR_LAMPUNG_SHIPPING } from "@/utils/constants";
-
-// --- Interfaces & Types ---
-
-export interface CheckoutItem extends CartItem {
-  subtotal: number;
-  originalSubtotal: number;
-  discountAmount: number;
-  stock: number; 
-  isOutOfStock: boolean;
-}
-
-export interface ComputationResult {
-  processedItems: CheckoutItem[];
-  subtotal: number; 
-  discountTotal: number; 
-  shippingCost: number;
-  finalTotal: number; 
-  originalSubtotal: number; 
-  isStockValid: boolean;
-}
+import type { CheckoutItem } from "@/types/checkout";
 
 interface ComputationProps {
-  cartItems: CartItem[];
-  selectedKecamatan: string | null;
+  cartItems: CheckoutItem[];
+  selectedKecamatan: string;
 }
 
-// --- Hook Utama ---
+const BASE_SHIPPING = 15000;
+const SHIPPING_RATE = 5000; // Biaya per 10 items
 
 export const useCheckoutComputation = ({
   cartItems,
   selectedKecamatan,
-}: ComputationProps): ComputationResult => {
-  const result = useMemo(() => {
-    if (!cartItems || cartItems.length === 0) {
-      return {
-        processedItems: [],
-        subtotal: 0,
-        discountTotal: 0,
-        shippingCost: 0,
-        finalTotal: 0,
-        originalSubtotal: 0,
-        isStockValid: true,
-      };
-    }
+}: ComputationProps) => {
+  const { subtotal, discountTotal, isStockValid } = useMemo(() => {
+    let subtotal = 0;
+    let discountTotal = 0;
+    let isStockValid = true; // Asumsi validasi stok sederhana
 
-    // --- 1. Hitung Ongkir ---
-    const shippingRate =
-      BANDAR_LAMPUNG_SHIPPING.find(
-        (rate) => rate.kecamatan === selectedKecamatan
-      )?.rate || 0; // Ongkir 0 jika kecamatan belum dipilih/tidak ditemukan
+    // Asumsi harga di item sudah harga bersih (setelah diskon)
+    cartItems.forEach((item) => {
+      subtotal += item.harga * item.quantity;
+      // Di sini bisa ditambahkan logika hitung discountTotal jika diperlukan
+      // discountTotal += (item.original_price - item.harga) * item.quantity;
 
-    // --- 2. Proses Item, Diskon, dan Stok ---
-    let overallStockValid = true;
-    const processedItems: CheckoutItem[] = cartItems.map((item) => {
-      // Dummy Stock (Asumsi API akan memberikan data stok)
-      const itemStock = 10; // Contoh: semua item memiliki stok 10
-      const isOutOfStock = item.quantity > itemStock;
-      if (isOutOfStock) overallStockValid = false;
-
-      // Hitung Diskon per item
-      const { priceAfterDiscount, discountAmount } = calculateDiscount(item);
-
-      const subtotal = priceAfterDiscount * item.quantity;
-      const originalSubtotal =
-        (item.original_price || item.price) * item.quantity;
-
-      return {
-        ...item,
-        price: priceAfterDiscount, // Ganti harga item dengan harga setelah diskon
-        subtotal,
-        originalSubtotal,
-        discountAmount: discountAmount * item.quantity,
-        stock: itemStock,
-        isOutOfStock,
-      };
+      // Validasi Stok Sederhana: Asumsi stok > 0
+      if (item.quantity <= 0) {
+        isStockValid = false;
+      }
     });
 
-    // --- 3. Hitung Total Global ---
-    const subtotal = processedItems.reduce(
-      (sum, item) => sum + item.subtotal,
-      0
-    );
-    const originalSubtotal = processedItems.reduce(
-      (sum, item) => sum + item.originalSubtotal,
-      0
-    );
-    const discountTotal = processedItems.reduce(
-      (sum, item) => sum + item.discountAmount,
-      0
-    );
+    return { subtotal, discountTotal, isStockValid };
+  }, [cartItems]);
 
-    const finalTotal = subtotal + shippingRate;
+  const shippingCost = useMemo(() => {
+    if (!selectedKecamatan) return 0;
+    // Logika perhitungan biaya kirim (contoh sederhana)
+    const totalWeight = cartItems.length; // Hitung berdasarkan jumlah item
+    const rate = Math.ceil(totalWeight / 10);
+    return BASE_SHIPPING + rate * SHIPPING_RATE;
+  }, [selectedKecamatan, cartItems]);
 
-    return {
-      processedItems,
-      subtotal,
-      discountTotal,
-      shippingCost: shippingRate,
-      finalTotal,
-      originalSubtotal,
-      isStockValid: overallStockValid,
-    };
-  }, [cartItems, selectedKecamatan]);
+  const finalTotal = subtotal + shippingCost - discountTotal;
 
-  return result;
+  return {
+    subtotal,
+    discountTotal,
+    shippingCost,
+    finalTotal,
+    processedItems: cartItems, // Menggunakan cartItems sebagai processedItems
+    isStockValid,
+  };
 };

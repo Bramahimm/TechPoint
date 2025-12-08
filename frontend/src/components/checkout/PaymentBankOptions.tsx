@@ -1,35 +1,52 @@
 // src/components/checkout/PaymentBankOptions.tsx
-import React from "react";
-import type { BankOption } from "@/utils/constants";
-import { BANK_OPTIONS } from "@/utils/constants";
 
-interface BankOptionsProps {
-  selectedBank: BankOption | null;
-  setSelectedBank: (bank: BankOption | null) => void;
+import React from "react";
+import { CheckCircle } from "lucide-react";
+import type { Bank } from "@/types/checkout";
+
+interface PaymentBankOptionsProps {
+  selectedBank: Bank | null;
+  setSelectedBank: (bank: Bank) => void;
+  isPaymentValid: boolean;
 }
 
-const PaymentBankOptions: React.FC<BankOptionsProps> = ({
+const banks: { key: Bank; name: string; iconUrl: string }[] = [
+  { key: "BCA", name: "Bank BCA", iconUrl: "bca.svg" },
+  { key: "BNI", name: "Bank BNI", iconUrl: "bni.svg" },
+  { key: "BRI", name: "Bank BRI", iconUrl: "bri.svg" },
+  { key: "MANDIRI", name: "Bank Mandiri", iconUrl: "mandiri.svg" },
+];
+
+const PaymentBankOptions: React.FC<PaymentBankOptionsProps> = ({
   selectedBank,
   setSelectedBank,
-}) => (
-  <div className="mt-4 p-4 border rounded-lg bg-indigo-50 space-y-2">
-    <p className="font-semibold text-sm mb-2">Pilih Bank Tujuan Transfer:</p>
-    <div className="grid grid-cols-3 gap-2">
-      {BANK_OPTIONS.map((bank) => (
-        <button
-          key={bank}
-          onClick={() => setSelectedBank(bank)}
-          className={`p-2 text-sm border rounded-lg transition-colors font-medium
-                        ${
-                          selectedBank === bank
-                            ? "bg-indigo-600 text-white border-indigo-600"
-                            : "bg-white hover:bg-gray-100"
-                        }`}>
-          {bank}
-        </button>
+}) => {
+  return (
+    <div className="space-y-3 p-4 border border-gray-200 rounded-lg bg-white">
+      <h3 className="font-semibold text-gray-700">Pilih Bank Transfer</h3>
+      {banks.map((bank) => (
+        <div
+          key={bank.key}
+          className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+            selectedBank === bank.key
+              ? "border-orange-500 bg-orange-50"
+              : "border-gray-300 hover:bg-gray-50"
+          }`}
+          onClick={() => setSelectedBank(bank.key)}>
+          <div className="flex items-center gap-3">
+            {/* Ganti dengan icon bank yang sebenarnya */}
+            <div className="w-8 h-8 flex items-center justify-center border rounded-md">
+              <span className="text-xs font-bold">{bank.key}</span>
+            </div>
+            <span className="text-sm font-medium">{bank.name}</span>
+          </div>
+          {selectedBank === bank.key && (
+            <CheckCircle className="w-5 h-5 text-orange-500" />
+          )}
+        </div>
       ))}
     </div>
-  </div>
-);
+  );
+};
 
 export default PaymentBankOptions;
