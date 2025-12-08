@@ -9,6 +9,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { ShoppingCart, ShoppingBag } from "lucide-react";
 import SuccessToast from "@/components/common/SuccessToast";
 import { toast } from "react-hot-toast";
+import ReviewSection from "./components/ReviewSection";
 
 const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -142,6 +143,10 @@ const ProductDetail: React.FC = () => {
           {product.deskripsi || "Tidak ada deskripsi tambahan."}
         </pre>
       </div>
+
+      {/* ✅ 2. INTEGRASI BAGIAN ULASAN DI SINI */}
+      <ReviewSection productId={product.id} />
+      
     </div>
   );
 };

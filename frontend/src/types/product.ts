@@ -69,3 +69,26 @@ export interface SellerOrder {
     price: number;
   }[];
 }
+
+// ulasan
+export interface UserSnapshot {
+  id: string;
+  nama: string;
+  avatar?: string;
+}
+
+export interface Review {
+  id: string;
+  barang_id: string;
+  user_id: string;
+  rating: number;
+  komentar: string;
+  created_at: string;
+  user: UserSnapshot; // Relasi ke user pembuat ulasan
+}
+
+export interface ReviewPayload {
+  barang_id: string;
+  rating: number;
+  komentar: string;
+}
