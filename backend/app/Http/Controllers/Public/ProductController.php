@@ -8,14 +8,19 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller {
 
-    public function index(Request $request) {
-        $products = Product::with(['toko', 'kategori'])
-            ->where('stok', '>', 0)
-            ->latest()
-            ->paginate(20);
+public function index(Request $request)
+{
+    $query = Product::with(['kategori', 'toko']);
 
-        return response()->json($products);
+    if ($request->has('kategori') && $request->kategori !== 'semua') {
+        $query->whereHas('kategori', function ($q) use ($request) {
+            $q->where('nama', $request->kategori);
+        });
     }
+
+    $products = $query->paginate(20);
+    return response()->json($products);
+}
 
     public function show($id) {
         $product = Product::with(['toko', 'kategori'])->findOrFail($id);

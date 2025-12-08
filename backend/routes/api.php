@@ -42,6 +42,7 @@ Route::get('/products/{id}', [PublicProductController::class, 'show']);
 Route::get('/products/{id}/ulasan', [UlasanController::class, 'index']);
 Route::get('/kategori', [KategoriController::class, 'index']);
 
+
 // SEMUA YANG BUTUH LOGIN + EMAIL TERVERIFIKASI
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 

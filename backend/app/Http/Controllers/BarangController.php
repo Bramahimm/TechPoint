@@ -1,22 +1,29 @@
-// app/Http/Controllers/BarangController.php (Controller CRUD)
 <?php
 
 namespace App\Http\Controllers;
 
-use App\Models\Barang;
+use App\Models\Product; // ← UBAH DARI Barang JADI Product
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class BarangController extends Controller {
-    public function index() {
-        $products = Barang::with(['kategori', 'toko'])->paginate(20);
+    public function index(Request $request) {
+        $query = Product::with(['kategori', 'toko']); // ← PAKAI Product
+
+        if ($request->has('kategori') && $request->kategori !== 'semua') {
+            $query->whereHas('kategori', function ($q) use ($request) {
+                $q->where('nama', $request->kategori);
+            });
+        }
+
+        $products = $query->paginate(20);
         return response()->json($products);
     }
 
     public function show($id) {
-        $product = Barang::with(['kategori', 'toko'])->findOrFail($id);
+        $product = Product::with(['kategori', 'toko'])->findOrFail($id); // ← Product
         $product->imageUrl = $product->gambar ? asset('storage/' . $product->gambar) : null;
         return response()->json($product);
     }
@@ -40,17 +47,17 @@ class BarangController extends Controller {
 
         if ($request->hasFile('gambar')) {
             $path = $request->file('gambar')->store('public/produk');
-            $validated['gambar'] = $path;
+            $validated['gambar'] = str_replace('public/', '', $path);
         }
 
-        $product = Barang::create($validated);
+        $product = Product::create($validated); // ← Product
         $product->imageUrl = $product->gambar ? asset('storage/' . $product->gambar) : null;
 
         return response()->json($product, 201);
     }
 
     public function update(Request $request, $id) {
-        $product = Barang::findOrFail($id);
+        $product = Product::findOrFail($id); // ← Product
         $user = Auth::user();
         if ($product->toko_id !== $user->toko->id) {
             return response()->json(['message' => 'Akses ditolak'], 403);
@@ -67,10 +74,10 @@ class BarangController extends Controller {
 
         if ($request->hasFile('gambar')) {
             if ($product->gambar) {
-                Storage::delete($product->gambar);
+                Storage::delete('public/' . $product->gambar);
             }
             $path = $request->file('gambar')->store('public/produk');
-            $validated['gambar'] = $path;
+            $validated['gambar'] = str_replace('public/', '', $path);
         }
 
         $product->update($validated);
@@ -80,14 +87,14 @@ class BarangController extends Controller {
     }
 
     public function destroy($id) {
-        $product = Barang::findOrFail($id);
+        $product = Product::findOrFail($id); // ← Product
         $user = Auth::user();
         if ($product->toko_id !== $user->toko->id) {
             return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
         if ($product->gambar) {
-            Storage::delete($product->gambar);
+            Storage::delete('public/' . $product->gambar);
         }
 
         $product->delete();

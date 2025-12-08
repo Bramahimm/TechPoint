@@ -36,16 +36,24 @@ interface Category {
   nama: string;
 }
 
-//FUNGSI PUBLIC (Tidak perlu autentikasi)
+// FUNGSI PUBLIC (Tidak perlu autentikasi)
 
-export const getProducts = async (): Promise<Product[]> => {
+// DIUBAH: Sekarang support parameter kategori (opsional)
+export const getProducts = async (params: Record<string, any> = {}): Promise<ProductResponse> => {
   try {
-    const response = await api.get<ProductResponse>("/products");
-    return response.data.data;
+    const response = await api.get<ProductResponse>("/products", { params });
+    return response.data; // ← langsung return object pagination (data, current_page, dll)
   } catch (error) {
     console.error("Error fetching public products: ", error);
     throw error;
   }
+};
+
+// TAMBAHAN BARU: Fungsi khusus untuk homepage (biar lebih jelas)
+export const getHomepageProducts = async (kategori?: string): Promise<Product[]> => {
+  const params = kategori && kategori !== "semua" ? { kategori } : {};
+  const response = await getProducts(params);
+  return response.data; // ← hanya ambil array produknya
 };
 
 export async function getProductById(id: string): Promise<Product> {
