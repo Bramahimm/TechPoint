@@ -12,8 +12,8 @@ interface AddressFormProps {
     kecamatan: string;
   };
   onFieldChange: (field: string, value: string) => void;
-  selectedCourier: LocalCourier | null;
-  setSelectedCourier: (courier: LocalCourier) => void;
+  selectedCourier: string | null; 
+    setSelectedCourier: (courier: string) => void; 
   selectedKecamatan: string;
 }
 

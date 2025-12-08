@@ -1,112 +1,39 @@
 // src/hooks/checkout/usePaymentSelection.tsx
 
 import { useState, useMemo } from "react";
+import type { PaymentMethod, Bank, EWallet } from "@/types/checkout"; // Asumsi imports
 
-import { BANK_OPTIONS, EWALLET_OPTIONS } from "@/utils/constants";
-
-import type {
-  PaymentMethod,
-  BankOption,
-  EWalletOption,
-  LocalCourier,
-} from "@/utils/constants";
-
-// --------------------------------------
-// INTERFACE FOR HOOK RESULT
-// --------------------------------------
-
-export interface PaymentSelectionResult {
-  selectedPaymentMethod: PaymentMethod | null;
-  setSelectedPaymentMethod: (method: PaymentMethod) => void;
-
-  selectedBank: BankOption | null;
-  setSelectedBank: (bank: BankOption | null) => void;
-
-  selectedEWallet: EWalletOption | null;
-  setSelectedEWallet: (wallet: EWalletOption | null) => void;
-
-  selectedCourier: LocalCourier | null;
-  setSelectedCourier: (courier: LocalCourier | null) => void;
-
-  isPaymentValid: boolean;
-}
-
-// --------------------------------------
-// MAIN HOOK
-// --------------------------------------
-
-export const usePaymentSelection = (): PaymentSelectionResult => {
+export const usePaymentSelection = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod | null>(null);
+  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [selectedEWallet, setSelectedEWallet] = useState<EWallet | null>(null);
+  const [selectedCourier, setSelectedCourier] = useState<string>("JNE"); // Asumsi default kurir
 
-  const [selectedBank, setSelectedBank] = useState<BankOption | null>(null);
-
-  const [selectedEWallet, setSelectedEWallet] = useState<EWalletOption | null>(
-    null
-  );
-
-  const [selectedCourier, setSelectedCourier] = useState<LocalCourier | null>(
-    null
-  );
-
-  // -------------------------------
-  // Handler: Set Payment Method
-  // -------------------------------
-  const handleSetPaymentMethod = (method: PaymentMethod) => {
-    setSelectedPaymentMethod(method);
-
-    if (method === "COD") {
-      setSelectedCourier("COD");
-    } else {
-      setSelectedCourier("Kurir Internal");
-    }
-
-    // Reset options
-    setSelectedBank(null);
-    setSelectedEWallet(null);
-  };
-
-  // -------------------------------
-  // Validation Logic
-  // -------------------------------
   const isPaymentValid = useMemo(() => {
     if (!selectedPaymentMethod) return false;
 
-    if (
-      selectedPaymentMethod === "BANK_TRANSFER" &&
-      (selectedBank === null || !BANK_OPTIONS.includes(selectedBank))
-    ) {
-      return false;
+    switch (selectedPaymentMethod) {
+      case "BANK_TRANSFER":
+        return selectedBank !== null;
+      case "E_WALLET":
+        return selectedEWallet !== null;
+      case "COD":
+        return true; // COD selalu valid jika dipilih
+      default:
+        return false;
     }
+  }, [selectedPaymentMethod, selectedBank, selectedEWallet]);
 
-    if (
-      selectedPaymentMethod === "E_WALLET" &&
-      (selectedEWallet === null || !EWALLET_OPTIONS.includes(selectedEWallet))
-    ) {
-      return false;
-    }
-
-    if (!selectedCourier) return false;
-
-    return true;
-  }, [selectedPaymentMethod, selectedBank, selectedEWallet, selectedCourier]);
-
-  // -------------------------------
-  // Return
-  // -------------------------------
   return {
     selectedPaymentMethod,
-    setSelectedPaymentMethod: handleSetPaymentMethod,
-
+    setSelectedPaymentMethod,
     selectedBank,
     setSelectedBank,
-
     selectedEWallet,
     setSelectedEWallet,
-
     selectedCourier,
     setSelectedCourier,
-
     isPaymentValid,
   };
 };

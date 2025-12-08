@@ -1,35 +1,23 @@
+// src/components/checkout/PaymentMethodSelector.tsx
 
-import React from "react";
-import type {
-  PaymentMethod,
-  BankOption,
-  EWalletOption,
-} from "@/utils/constants";
-import { PAYMENT_METHODS } from "@/utils/constants";
+import React, { useState } from "react";
+import { CreditCard, Wallet, Truck, CheckCircle } from "lucide-react";
 import PaymentBankOptions from "./PaymentBankOptions";
 import PaymentEWalletOptions from "./PaymentEWalletOptions";
 import PaymentCODOption from "./PaymentCODOption";
-import { Banknote, Landmark, Wallet } from "lucide-react";
+import type { PaymentMethod, Bank, EWallet } from "@/types/checkout";
 
-interface PaymentSelectorProps {
+interface PaymentMethodSelectorProps {
   selectedPaymentMethod: PaymentMethod | null;
   setSelectedPaymentMethod: (method: PaymentMethod) => void;
-
-  selectedBank: BankOption | null;
-  setSelectedBank: (bank: BankOption | null) => void;
-
-  selectedEWallet: EWalletOption | null;
-  setSelectedEWallet: (wallet: EWalletOption | null) => void;
+  selectedBank: Bank | null;
+  setSelectedBank: (bank: Bank) => void;
+  selectedEWallet: EWallet | null;
+  setSelectedEWallet: (wallet: EWallet) => void;
+  isPaymentValid: boolean;
 }
 
-
-const iconMap: { [key: string]: React.ReactNode } = {
-  Banknote: <Banknote className="w-5 h-5" />,
-  Landmark: <Landmark className="w-5 h-5" />,
-  Wallet: <Wallet className="w-5 h-5" />,
-};
-
-const PaymentMethodSelector: React.FC<PaymentSelectorProps> = ({
+const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   selectedPaymentMethod,
   setSelectedPaymentMethod,
   selectedBank,
@@ -37,59 +25,126 @@ const PaymentMethodSelector: React.FC<PaymentSelectorProps> = ({
   selectedEWallet,
   setSelectedEWallet,
 }) => {
-  // --- Render Panel Detail Pembayaran ---
-  const renderSubPaymentOptions = () => {
-    switch (selectedPaymentMethod) {
-      case "BANK_TRANSFER":
-        return (
-          <PaymentBankOptions
-            selectedBank={selectedBank}
-            setSelectedBank={setSelectedBank}
-          />
-        );
-      case "E_WALLET":
-        return (
-          <PaymentEWalletOptions
-            selectedEWallet={selectedEWallet}
-            setSelectedEWallet={setSelectedEWallet}
-          />
-        );
-      case "COD":
-        return <PaymentCODOption />;
-      default:
-        return null;
+  const [openSection, setOpenSection] = useState<PaymentMethod | null>(
+    selectedPaymentMethod
+  );
+
+  const toggleSection = (method: PaymentMethod) => {
+    if (selectedPaymentMethod !== method) {
+      setSelectedPaymentMethod(method);
+      setOpenSection(method);
+    } else {
+      setOpenSection(openSection === method ? null : method);
     }
   };
 
+  const isSelected = (method: PaymentMethod) =>
+    selectedPaymentMethod === method;
+
+  const isOpen = (method: PaymentMethod) => openSection === method;
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md mt-6">
-      <h2 className="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <h2 className="text-xl font-bold mb-4 text-gray-800">
         Metode Pembayaran
       </h2>
 
-      {/* Tab Header (Seperti Shopee) */}
-      <div className="flex border-b border-gray-200">
-        {PAYMENT_METHODS.map((method) => {
-          const isSelected = selectedPaymentMethod === method.id;
-          return (
-            <button
-              key={method.id}
-              onClick={() => setSelectedPaymentMethod(method.id)}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold transition-colors
-                                ${
-                                  isSelected
-                                    ? "text-orange-600 border-b-2 border-orange-600"
-                                    : "text-gray-600 hover:text-orange-500"
-                                }`}>
-              {iconMap[method.icon]}
-              {method.label}
-            </button>
-          );
-        })}
+      {/* 1. BANK TRANSFER */}
+      <div className="mb-4 border rounded-lg overflow-hidden">
+        <div
+          className={`p-4 flex justify-between items-center cursor-pointer transition-colors ${
+            isSelected("BANK_TRANSFER")
+              ? "bg-orange-100/50"
+              : "hover:bg-gray-50"
+          }`}
+          onClick={() => toggleSection("BANK_TRANSFER")}>
+          <div className="flex items-center gap-3">
+            <CreditCard className="w-5 h-5 text-orange-500" />
+            <span className="font-semibold text-gray-800">Bank Transfer</span>
+          </div>
+
+          {isSelected("BANK_TRANSFER") && selectedBank ? (
+            <span className="text-sm font-semibold text-orange-600">
+              {selectedBank}
+            </span>
+          ) : (
+            <span className="text-xs text-gray-500">Pilih Bank &gt;</span>
+          )}
+        </div>
+
+        {isOpen("BANK_TRANSFER") && (
+          <div className="p-3 border-t bg-white">
+            <PaymentBankOptions
+              selectedBank={selectedBank}
+              setSelectedBank={setSelectedBank}
+              isPaymentValid={selectedBank !== null}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Panel Detail (Konten Tab) */}
-      <div className="mt-4">{renderSubPaymentOptions()}</div>
+      {/* 2. E-WALLET */}
+      <div className="mb-4 border rounded-lg overflow-hidden">
+        <div
+          className={`p-4 flex justify-between items-center cursor-pointer transition-colors ${
+            isSelected("E_WALLET") ? "bg-orange-100/50" : "hover:bg-gray-50"
+          }`}
+          onClick={() => toggleSection("E_WALLET")}>
+          <div className="flex items-center gap-3">
+            <Wallet className="w-5 h-5 text-green-500" />
+            <span className="font-semibold text-gray-800">E-Wallet</span>
+          </div>
+
+          {isSelected("E_WALLET") && selectedEWallet ? (
+            <span className="text-sm font-semibold text-orange-600">
+              {selectedEWallet}
+            </span>
+          ) : (
+            <span className="text-xs text-gray-500">Pilih E-Wallet &gt;</span>
+          )}
+        </div>
+
+        {isOpen("E_WALLET") && (
+          <div className="p-3 border-t bg-white">
+            <PaymentEWalletOptions
+              selectedEWallet={selectedEWallet}
+              setSelectedEWallet={setSelectedEWallet}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* 3. COD */}
+      <div className="border rounded-lg overflow-hidden">
+        <div
+          className={`p-4 flex justify-between items-center cursor-pointer transition-colors ${
+            isSelected("COD") ? "bg-orange-100/50" : "hover:bg-gray-50"
+          }`}
+          onClick={() => toggleSection("COD")}>
+          <div className="flex items-center gap-3">
+            <Truck className="w-5 h-5 text-blue-500" />
+            <span className="font-semibold text-gray-800">
+              Bayar di Tempat (COD)
+            </span>
+          </div>
+
+          {isSelected("COD") ? (
+            <CheckCircle className="w-5 h-5 text-orange-500" />
+          ) : (
+            <span className="text-xs text-gray-500">Pilih &gt;</span>
+          )}
+        </div>
+
+        {/* ⬇ FIX: Komponen COD sekarang digunakan → ESLint OK */}
+        {isOpen("COD") && (
+          <div className="p-3 border-t bg-white">
+            <PaymentCODOption
+              isSelected={isSelected("COD")}
+              onSelect={() => setSelectedPaymentMethod("COD")}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
