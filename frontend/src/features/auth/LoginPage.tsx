@@ -13,7 +13,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showResend, setShowResend] = useState(false);
 
-  // SEMUA HOOKS DI ATAS!
   const { login, user, checkAuth, resendVerification } = useAuth();
   const navigate = useNavigate();
 
@@ -28,12 +27,11 @@ export default function LoginPage() {
     setShowResend(false);
 
     try {
-      await login(form);
-      if (!user) await checkAuth();
+      const loggedInUser = await login(form); // <-- pakai user dari login()
 
-      if (user?.role === "admin") {
+      if (loggedInUser.role === "admin") {
         navigate("/admin/dashboard");
-      } else if (user?.role === "penjual") {
+      } else if (loggedInUser.role === "penjual") {
         navigate("/seller/orders");
       } else {
         navigate("/dashboard");
