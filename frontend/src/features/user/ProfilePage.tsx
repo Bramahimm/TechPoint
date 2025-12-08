@@ -112,7 +112,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 py-12 min-h-screen">
         <h1 className="text-4xl font-bold text-gray-800 mb-10 text-center">
@@ -273,7 +272,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <Footer />
       <Toaster position="top-center" />
     </>
   );
