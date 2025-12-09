@@ -172,9 +172,6 @@ export default function CheckoutPage() {
       window.snap.pay(snap_token, {
         onSuccess: () => {
           toast.success("Pembayaran berhasil diproses.");
-          navigate("/order/success", {
-            state: { invoiceNumber: invoice_number },
-          });
         },
         onPending: () => {
           toast.success("Menunggu pembayaran Anda.");

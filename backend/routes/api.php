@@ -58,7 +58,7 @@ Route::get('/kategori', [KategoriController::class, 'index']);
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
-
+    Route::get('/orders/{invoiceNumber}', [OrderController::class, 'show']);
     // TOKO (SELLER ONBOARDING)
     Route::get('/toko/me', [TokoController::class, 'show']);
     Route::post('/toko', [TokoController::class, 'store']);
@@ -73,6 +73,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // 💡 ORDER & CHECKOUT (MIDTRANS INTEGRATION)
     // POST /orders akan membuat Order di DB & memanggil Midtrans Snap
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders', [OrderController::class, 'index']);
     // Transaksi dan Histori Order User (optional)
     Route::get('/transaksi', [TransaksiController::class, 'index']);
     // Rute /checkout lama yang mungkin sudah tidak diperlukan (diganti /orders)

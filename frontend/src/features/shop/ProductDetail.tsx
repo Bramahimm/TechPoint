@@ -1,7 +1,7 @@
 // src/features/shop/ProductDetail.tsx
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getProductBySlug } from "@/services/productService";
 import { addProductToCart } from "@/services/cartService";
 import type { Product } from "@/types/product";
