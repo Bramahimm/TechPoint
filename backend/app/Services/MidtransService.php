@@ -89,7 +89,7 @@ class MidtransService {
             ],
             'item_details' => $itemDetails,
             'callbacks' => [
-                'finish' => URL::to("/orders"),
+                'finish' => URL::to("/order/status/{$order->invoice_number}?status=success"),
                 'error' => URL::to("/order/status/{$order->invoice_number}?status=error"),
                 'pending' => URL::to("/order/status/{$order->invoice_number}?status=pending"),
             ],
